@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2025-12-24 08:06:59
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-15 14:21:06
+ * @LastEditTime: 2026-01-15 14:43:42
  * @FilePath: /vip/README.md
  * @Description: 项目文档
 -->
@@ -307,7 +307,7 @@
    FOREIGN KEY (record_id) REFERENCES record(id) ON DELETE CASCADE,
    FOREIGN KEY (tag_id) REFERENCES tag(id) ON DELETE CASCADE,
    UNIQUE KEY uk_record_tag (record_id, tag_id)
-   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='记录关联标签表';  
+   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='记录关联标签表';
 
    -- 插入部门数据(层级：1 管理员 →2 处级 →3 科级)
    INSERT INTO department (name, parent_id, level, path) VALUES
@@ -346,8 +346,8 @@
 
    -- 插入记录数据
    INSERT INTO record (content) VALUES
-   ('2023年1月1日K554次列车上饮酒斗殴'),
-   ('2023年1月2日佳木斯站出站口喊站揽客');
+   ('2023 年 1 月 1 日 K554 次列车上饮酒斗殴'),
+   ('2023 年 1 月 2 日佳木斯站出站口喊站揽客');
 
    -- 插入关联数据
    INSERT INTO auth2department (auth_id, department_id) VALUES
