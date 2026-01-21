@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-15 14:10:54
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-16 09:07:03
+ * @LastEditTime: 2026-01-21 09:39:40
  * @FilePath: /qb/nuxt.config.ts
  * @Description: nuxt 配置文件
  */

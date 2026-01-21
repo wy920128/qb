@@ -2,19 +2,16 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-14 15:53:23
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-14 16:07:34
+ * @LastEditTime: 2026-01-20 08:10:57
  * @FilePath: /vip/types/auth2classify.ts
  * @Description: types/auth2classify 用户关联分类表
  */
-import type { PageParams, TimeStamp } from ".";
+import type { PageParams, Time } from ".";
 
 /** 用户关联分类表-本体 */
-interface Auth2Classify {
+export interface Auth2Classify extends Time {
   auth_id: number; // 用户ID
   classify_id: number; // 分类ID
-  created_time: TimeStamp; // 创建时间
-  updated_time: TimeStamp; // 更新时间
-  deleted_time: TimeStamp; // 软删除标记
 }
 /** 用户关联分类表-展示用VO */
 interface Auth2ClassifyVO extends Auth2Classify {

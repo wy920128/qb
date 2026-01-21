@@ -2,13 +2,13 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-06 08:38:45
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-16 10:53:16
+ * @LastEditTime: 2026-01-20 13:57:28
  * @FilePath: /vip/server/api/auth/login.ts
  * @Description: 后台登录接口
  */
 import { SignJWT } from "jose";
 import bcrypt from "bcryptjs";
-import type { AuthVO, Res } from "~/types/index";
+import type { AuthRes, AuthVO, Res, Time } from "~/types/index";
 import type { Auth, AuthLoginPO } from "~/types";
 import { query } from "~/server/utils/query";
 
@@ -16,9 +16,7 @@ import { query } from "~/server/utils/query";
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export default defineEventHandler(
-  async (
-    event
-  ): Promise<Res<Omit<AuthVO & { token: string }, `password`> | null>> => {
+  async (event): Promise<Res<AuthRes | null>> => {
     try {
       // 1. 读取并验证请求体
       const body: AuthLoginPO = await readBody<AuthLoginPO>(event);
@@ -45,7 +43,7 @@ export default defineEventHandler(
       // 绑定用户名参数
       params.push(username);
       // 执行查询
-      const userResult: Auth[] = await query(userSelectSql, params);
+      const userResult: (Auth & Time)[] = await query(userSelectSql, params);
       if (userResult.length !== 1) {
         throw createError({
           statusCode: 401,
@@ -57,6 +55,9 @@ export default defineEventHandler(
         username: userResult[0].username,
         password: userResult[0].password,
         role: userResult[0].role,
+        created_time: userResult[0].created_time,
+        updated_time: userResult[0].updated_time,
+        deleted_time: userResult[0].deleted_time,
       };
       const isPwdValid = bcrypt.compareSync(password, user.password);
       if (!isPwdValid) {
@@ -73,19 +74,13 @@ export default defineEventHandler(
         .setProtectedHeader({ alg: `HS256` }) // HMAC-SHA256加密算法
         .setExpirationTime(expiresIn) // 过期时间
         .sign(JWT_SECRET);
-      const userInfo: Omit<AuthVO & { token: string }, `password`> = {
-        id: user.id,
-        username: user.username,
-        role: user.role,
-        token,
-        created_time: userResult[0].created_time,
-        updated_time: userResult[0].updated_time,
-        deleted_time: userResult[0].deleted_time,
-      };
       return {
         code: 200, // 成功状态码
         data: {
-          list: userInfo,
+          list: {
+            token,
+            ...user,
+          },
           pagination: {
             page: 1,
             pageSize: 1,
@@ -118,5 +113,5 @@ export default defineEventHandler(
         timestamp: new Date().toISOString(),
       };
     }
-  }
+  },
 );
