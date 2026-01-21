@@ -2,12 +2,12 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-06 08:38:45
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-21 09:19:15
+ * @LastEditTime: 2026-01-21 11:04:40
  * @FilePath: /vip/server/api/auth/validate.ts
  * @Description: Token验证接口
  */
 import { jwtVerify } from "jose";
-import type { AuthVO, Res, Time } from "~/types/index";
+import type { AuthRes, Res, Time } from "~/types/index";
 import type { Auth } from "~/types";
 import { query } from "~/server/utils/query";
 
@@ -15,7 +15,7 @@ import { query } from "~/server/utils/query";
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export default defineEventHandler(
-  async (event): Promise<Res<AuthVO | null>> => {
+  async (event): Promise<Res<AuthRes[] | null>> => {
     try {
       // 1. 从Authorization头中获取token
       const authHeader = getHeader(event, `Authorization`);
@@ -72,7 +72,7 @@ export default defineEventHandler(
       return {
         code: 200,
         data: {
-          list: userInfo,
+          list: [{ token, ...userInfo }],
           pagination: {
             page: 1,
             pageSize: 1,

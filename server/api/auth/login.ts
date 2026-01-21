@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-06 08:38:45
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-20 13:57:28
+ * @LastEditTime: 2026-01-21 11:04:20
  * @FilePath: /vip/server/api/auth/login.ts
  * @Description: 后台登录接口
  */
@@ -16,7 +16,7 @@ import { query } from "~/server/utils/query";
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export default defineEventHandler(
-  async (event): Promise<Res<AuthRes | null>> => {
+  async (event): Promise<Res<AuthRes[] | null>> => {
     try {
       // 1. 读取并验证请求体
       const body: AuthLoginPO = await readBody<AuthLoginPO>(event);
@@ -77,10 +77,12 @@ export default defineEventHandler(
       return {
         code: 200, // 成功状态码
         data: {
-          list: {
-            token,
-            ...user,
-          },
+          list: [
+            {
+              token,
+              ...user,
+            },
+          ],
           pagination: {
             page: 1,
             pageSize: 1,

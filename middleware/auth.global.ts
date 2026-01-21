@@ -25,7 +25,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
     const isInWhiteList = whiteListPaths.includes(to.path);
 
     // 初始化认证状态（确保状态同步）
-    if (process.client) {
+    if (import.meta.client) {
       auth.initializeAuth();
     }
 
