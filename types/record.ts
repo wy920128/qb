@@ -2,19 +2,23 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-14 15:49:44
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-14 15:50:04
+ * @LastEditTime: 2026-01-22 15:17:47
  * @FilePath: /vip/types/record.ts
  * @Description: types/record 记录
  */
-import type { PageParams, TimeStamp } from ".";
+import type { PageParams, TagRes, Time, TimeStamp } from ".";
 
-/** 记录表-本体 */
+/** 记录-本体 */
 interface Record {
   id: number; // 记录主键ID
   content: string; // 事件内容
   created_time: TimeStamp; // 创建时间
   updated_time: TimeStamp; // 更新时间
   deleted_time: TimeStamp; // 软删除标记
+}
+/** 记录-后端返回 */
+export interface RecordRes extends Record, Time {
+  tag: TagRes[] | undefined; // 关联的标签内容
 }
 /** 记录表-展示用VO */
 interface RecordVO extends Record {

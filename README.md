@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2025-12-24 08:06:59
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-22 10:19:00
+ * @LastEditTime: 2026-01-22 15:56:29
  * @FilePath: /vip/README.md
  * @Description: 项目文档
 -->
@@ -124,7 +124,7 @@
      | updated_time | 更新时间(更新时自动刷新) |       无       |
      | deleted_time | 软删除标记(NULL=未删除)  |       无       |
 
-   - person2classify 人员关联分类表
+   - classify2person 人员关联分类表
      存储人员与分类的关联关系(人员 ID, 分类 ID)
 
      |    字段名    |         字段备注         |       关联       |
@@ -272,8 +272,8 @@
    UNIQUE KEY uk_auth_person (auth_id, person_id)
    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户关联人员表';
 
-   -- 10. 创建人员关联分类表(person2classify)
-   CREATE TABLE IF NOT EXISTS person2classify (
+   -- 10. 创建人员关联分类表(classify2person)
+   CREATE TABLE IF NOT EXISTS classify2person (
    person_id INT UNSIGNED NOT NULL COMMENT '人员 ID',
    classify_id INT UNSIGNED NOT NULL COMMENT '分类 ID',
    created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -362,7 +362,7 @@
    (1, 1), -- 025871 管理张三
    (2, 2); -- 000001 管理李四
 
-   INSERT INTO person2classify (person_id, classify_id) VALUES
+   INSERT INTO classify2person (person_id, classify_id) VALUES
    (1, 1), -- 张三属于涉酒分类
    (2, 2); -- 李四属于涉毒分类
 

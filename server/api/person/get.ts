@@ -1,5 +1,4 @@
-import { Res } from "~/types";
-import { PersonRes } from "~/types/person";
+import { PersonRes, Res } from "~/types";
 import { utilsQuery } from "~/server/utils/query";
 
 export default defineEventHandler(async (event): Promise<Res<PersonRes[]>> => {
@@ -143,7 +142,7 @@ export default defineEventHandler(async (event): Promise<Res<PersonRes[]>> => {
     // 补充分页参数（只用于selectSql）
     params.push(pageSizeNum, offset);
 
-    const personList = await utilsQuery(selectSql, params);
+    const personList: PersonRes[] = await utilsQuery(selectSql, params);
     const countResult = await utilsQuery(countSql, countParams);
     const total = Number((countResult as any[])[0]?.total) || 0;
 

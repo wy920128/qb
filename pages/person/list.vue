@@ -251,33 +251,6 @@ const handleDetail = (row: PersonVO) => {
   goToDetail(row.id!);
 };
 
-const handleDelete = async (row: PersonVO) => {
-  try {
-    await ElMessageBox.confirm(`确定要删除人员 "${row.name}" 吗？`, "提示", {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
-      type: "warning",
-    });
-
-    // 调用删除API
-    const response: Res<any> = await $fetch(`/api/person/delete`, {
-      method: "DELETE",
-      body: { id: row.id },
-    });
-
-    if (response.code === 200) {
-      ElMessage.success("删除成功");
-      await searchForm.btn_search(); // 刷新列表
-    } else {
-      ElMessage.error(response.message || "删除失败");
-    }
-  } catch (error) {
-    if (error !== "cancel") {
-      ElMessage.error(`删除人员失败: ${error}`);
-    }
-  }
-};
-
 // 检查用户认证状态
 const checkAuthStatus = () => {
   const userId = getCurrentUserId();
@@ -448,14 +421,6 @@ onMounted(async () => {
                 @click="handleEdit(row)"
               >
                 编辑
-              </el-button>
-              <el-button
-                size="small"
-                type="danger"
-                link
-                @click="handleDelete(row)"
-              >
-                删除
               </el-button>
             </template>
 
