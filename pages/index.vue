@@ -50,8 +50,12 @@
       <!-- 操作按钮 -->
       <div class="action-buttons">
         <button @click="handleLogout" class="logout-btn">退出登录</button>
-        <button @click="refreshUserInfo" class="refresh-btn">
-          刷新用户信息
+        <button
+          @click="refreshUserInfo"
+          class="refresh-btn"
+          :disabled="isRefreshing"
+        >
+          {{ isRefreshing ? "刷新中..." : "刷新用户信息" }}
         </button>
       </div>
     </div>
@@ -66,7 +70,10 @@
     <span>校验登录状态中...</span>
   </div>
 </template>
+
 <script lang="ts" setup>
+const { validateToken } = useAuth();
+
 // 使用 Cookie 管理认证状态
 const authState = useCookie("auth-data", {
   default: () => ({
@@ -78,98 +85,137 @@ const authState = useCookie("auth-data", {
   maxAge: 60 * 60 * 24 * 7, // 7天过期
   secure: process.env.NODE_ENV === "production",
   sameSite: "lax",
+  path: "/",
 });
+
 // 加载状态
 const isChecking = ref(true);
+const isRefreshing = ref(false);
 const route = useRoute();
+
 // 计算属性: 获取 Cookie 数据用于展示
 const cookieData = computed(() => authState.value);
-// 计算属性: 判断登录态是否有效
+
+// 【关键修复1】加固计算属性，确保始终返回布尔值
 const isLoginValid = computed(() => {
-  const state = authState.value;
-  const isValid =
-    state.isAuthenticated &&
-    !!state.token &&
-    !!state.user &&
-    state.expiresAt > Date.now();
-  console.log("模板渲染时 isLoginValid:", isValid); // 新增：确认模板读取的数值
+  // 先判断state是否存在，避免undefined
+  const state = authState.value || {
+    isAuthenticated: false,
+    token: "",
+    user: null,
+    expiresAt: 0,
+  };
+
+  // 逐个属性做边界判断，避免表达式短路返回undefined
+  const hasAuth = Boolean(state.isAuthenticated);
+  const hasToken = Boolean(state.token);
+  const hasUser = Boolean(state.user);
+  const isExpiresValid =
+    typeof state.expiresAt === "number" && state.expiresAt > Date.now();
+
+  const isValid = hasAuth && hasToken && hasUser && isExpiresValid;
   return isValid;
 });
+
 // 退出登录处理
 const handleLogout = async (): Promise<void> => {
+  if (isRefreshing.value) return;
   try {
-    // 调用退出 API（如果后端需要）
-    if (authState.value.token) {
-      await $fetch("/api/auth/logout", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${authState.value.token}`,
-        },
-      });
+    isRefreshing.value = true;
+    if (authState.value?.token) {
+      try {
+        await $fetch("/api/auth/logout", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${authState.value.token}`,
+          },
+        });
+      } catch (apiError) {
+        ElMessage.error(`退出 API 调用失败，继续本地清理: ${apiError}`);
+      }
     }
-  } catch (error) {
-    console.error("退出登录 API 错误:", error);
-  } finally {
-    // 清除认证状态（替换整个对象，确保响应式）
+    const authCookie = useCookie("auth-data", {
+      path: "/",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+    authCookie.value = null;
     authState.value = {
       token: "",
       user: null,
       expiresAt: 0,
       isAuthenticated: false,
     };
-    // 跳转到登录页
     await navigateTo("/login");
+  } catch (error) {
+    ElMessage.error(`退出登录过程中出错: ${error}`);
+  } finally {
+    isRefreshing.value = false;
   }
 };
-// 刷新用户信息
+
+// 【关键修复2】优化刷新用户信息逻辑，同步更新authState
 const refreshUserInfo = async (): Promise<void> => {
-  if (!authState.value.token) return;
+  if (isRefreshing.value || !authState.value.token) return;
+
   try {
-    const response = await $fetch<{ valid: boolean; user?: any }>(
-      "/api/auth/validate",
-      {
-        headers: {
-          Authorization: `Bearer ${authState.value.token}`,
-        },
-      },
+    isRefreshing.value = true;
+    // 调用验证token接口，确保返回布尔值
+    const resValidateToken: boolean = await validateToken(
+      authState.value.token,
     );
-    if (response.valid && response.user) {
-      // 替换整个对象，确保响应式更新
+
+    if (resValidateToken) {
+      // 【关键】刷新成功后更新authState，触发响应式更新
+      // 这里假设validateToken返回true时，可重新设置过期时间（比如延长30分钟）
+      const currentState = authState.value;
       authState.value = {
-        ...authState.value,
-        user: response.user,
+        ...currentState,
+        expiresAt: Date.now() + 30 * 60 * 1000, // 延长30分钟过期
+        isAuthenticated: true, // 确保认证状态为true
       };
-      console.log("用户信息刷新成功");
+      await nextTick(); // 等待响应式更新完成
     } else {
       await handleLogout();
     }
   } catch (error) {
-    console.error("刷新用户信息失败:", error);
+    ElMessage.error(`刷新用户信息失败: ${error}`);
     await handleLogout();
+  } finally {
+    isRefreshing.value = false;
   }
 };
+
 // 跳转到登录页
 const redirectToLogin = async (): Promise<void> => {
   if (import.meta.client && route.path !== "/login") {
-    await navigateTo("/login");
+    const redirectPath = encodeURIComponent(route.fullPath);
+    await navigateTo(
+      {
+        path: "/login",
+        query: {
+          redirect: redirectPath, // 把当前页面路径传给登录页
+        },
+      },
+      { replace: true },
+    ); // replace 避免路由历史记录冗余
   }
 };
-// 初始化认证状态（关键修复：替换整个对象而非修改嵌套属性）
+
+// 初始化认证状态
 const initializeAuth = (): void => {
   if (import.meta.client) {
     const currentState = authState.value;
-    console.log("🚀 初始化前 authState: ", currentState);
     // 验证 token 有效性
     const isTokenValid =
       currentState.token && currentState.expiresAt > Date.now();
+
     if (isTokenValid) {
-      // 替换整个对象，触发响应式更新
       authState.value = {
         ...currentState,
-        isAuthenticated: true, // 修正认证状态
+        isAuthenticated: true,
       };
     } else {
-      // Token 过期或无效，清除状态
       authState.value = {
         token: "",
         user: null,
@@ -177,37 +223,32 @@ const initializeAuth = (): void => {
         isAuthenticated: false,
       };
     }
-    console.log("🚀 初始化后 authState: ", authState.value);
   }
 };
+
 // 页面挂载后的初始化逻辑
 onMounted(async () => {
   if (import.meta.client) {
     try {
-      // 初始化认证状态
       initializeAuth();
-      // 强制等待响应式更新完成
       await nextTick();
-      console.log("🚀 初始化后 isLoginValid 计算结果: ", isLoginValid.value);
-      // 如果未登录，跳转到登录页
       if (!isLoginValid.value) {
-        console.log("未登录，跳转到登录页");
         await redirectToLogin();
       }
     } catch (error) {
-      console.error("初始化认证状态失败:", error);
+      ElMessage.error(`初始化认证状态失败: ${error}`);
     } finally {
-      // 结束加载状态（无论成功/失败）
       isChecking.value = false;
     }
   }
 });
-// 监听路由变化，确保登录状态正确
+
+// 监听路由变化
 watch(
   () => route.path,
   async (newPath) => {
     if (newPath === "/" && import.meta.client) {
-      await nextTick(); // 等待响应式更新
+      await nextTick();
       if (!isLoginValid.value) {
         redirectToLogin();
       }
@@ -216,7 +257,9 @@ watch(
   { immediate: false },
 );
 </script>
+
 <style scoped>
+/* 样式部分保持不变 */
 .home-container {
   padding: 20px;
   max-width: 800px;

@@ -2,15 +2,15 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-06 08:38:45
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-21 11:04:20
+ * @LastEditTime: 2026-01-22 10:14:29
  * @FilePath: /vip/server/api/auth/login.ts
  * @Description: 后台登录接口
  */
 import { SignJWT } from "jose";
 import bcrypt from "bcryptjs";
-import type { AuthRes, AuthVO, Res, Time } from "~/types/index";
+import type { AuthRes, Res, Time } from "~/types/index";
 import type { Auth, AuthLoginPO } from "~/types";
-import { query } from "~/server/utils/query";
+import { utilsQuery } from "~/server/utils/query";
 
 // JWT密钥（推荐通过Nuxt环境变量配置，.env文件）
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
@@ -43,7 +43,7 @@ export default defineEventHandler(
       // 绑定用户名参数
       params.push(username);
       // 执行查询
-      const userResult: (Auth & Time)[] = await query(userSelectSql, params);
+      const userResult: (Auth & Time)[] = await utilsQuery(userSelectSql, params);
       if (userResult.length !== 1) {
         throw createError({
           statusCode: 401,

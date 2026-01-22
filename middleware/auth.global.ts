@@ -2,117 +2,116 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-15 16:11:25
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-21 10:24:32
+ * @LastEditTime: 2026-01-21 17:09:14
  * @FilePath: /qb/middleware/auth.global.ts
  * @Description: 基于 useAuth Composable 的全局路由守卫
  */
 
+// 路由白名单：无需认证即可访问的页面
+const AUTH_WHITE_LIST = ["/login", "/register", "/auth/login"] as const;
+// 默认重定向首页
+const DEFAULT_REDIRECT_HOME = "/" as const;
+// 登录页路径
+const LOGIN_PAGE_PATH = "/login" as const;
+
 // 路由元数据类型定义
 declare module "#app" {
   interface PageMeta {
-    requiresAuth?: boolean;
-    requiredRoles?: string[];
+    requiresAuth?: boolean; // 是否需要登录认证
+    requiredRoles?: string[]; // 需要的角色列表（需配合 requiresAuth: true 使用）
   }
 }
 
-export default defineNuxtRouteMiddleware((to, from) => {
+const isPathInWhiteList = (path: string): boolean => {
+  return AUTH_WHITE_LIST.includes(path as (typeof AUTH_WHITE_LIST)[number]);
+};
+
+const hasRequiredRoles = (
+  userRoles: string[],
+  requiredRoles: string[],
+): boolean => {
+  if (!requiredRoles.length) return true; // 无角色要求则默认通过
+  return requiredRoles.some((role) => userRoles.includes(role));
+};
+
+export default defineNuxtRouteMiddleware(async (to, from) => {
+  // 仅在客户端初始化认证状态（服务端无 Cookie/本地存储）
+  const auth = useAuth();
+  let authInitialized = false;
+
   try {
-    // 使用 useAuth Composable 获取认证状态 [1,6](@ref)
-    const auth = useAuth();
-
-    // 白名单配置：不需要认证的路径
-    const whiteListPaths = ["/login", "/register", "/auth/login"];
-    const isInWhiteList = whiteListPaths.includes(to.path);
-
-    // 初始化认证状态（确保状态同步）
-    if (import.meta.client) {
-      auth.initializeAuth();
+    // 客户端初始化认证状态（确保从 Cookie 恢复状态），仅执行一次
+    if (import.meta.client && !authInitialized) {
+      await auth.initializeAuth(); // 原代码未 await，可能导致状态未同步完成
+      authInitialized = true;
     }
 
-    console.log(
-      "Auth Middleware - Path:",
-      to.path,
-      "Authenticated:",
-      auth.isAuthenticated.value,
-      "WhiteList:",
-      isInWhiteList,
-    );
-
-    // 提前返回：不需要认证的页面 [6](@ref)
-    if (!to.meta.requiresAuth && !isInWhiteList) {
-      return;
-    }
-
-    // 主逻辑判断
-    // 案例A: 用户未登录且试图访问需要认证的页面 → 跳转到登录页
-    if (!auth.isAuthenticated.value && !isInWhiteList) {
-      // 防止重定向循环：确保不在目标页面
-      if (to.path !== "/login") {
-        return navigateTo({
-          path: "/login",
-          query: {
-            redirect: to.fullPath,
-            reason: "unauthorized",
-          },
-        });
+    // 1. 白名单页面处理：已登录用户访问白名单 → 跳首页；未登录则放行
+    if (isPathInWhiteList(to.path)) {
+      if (auth.isAuthenticated.value && to.path !== DEFAULT_REDIRECT_HOME) {
+        return navigateTo(DEFAULT_REDIRECT_HOME);
       }
+      return; // 未登录用户访问白名单，直接放行
+    }
+
+    // 2. 非白名单页面：无需认证 → 直接放行
+    if (!to.meta.requiresAuth) {
       return;
     }
 
-    // 案例B: 用户已登录却试图访问登录/注册页 → 跳转到首页 [6](@ref)
-    if (auth.isAuthenticated.value && isInWhiteList) {
-      // 避免当前已经在首页还重定向
-      if (to.path !== "/") {
-        return navigateTo("/");
-      }
-      return;
+    // 3. 需要认证的页面：未登录 → 跳登录页（带重定向参数）
+    if (!auth.isAuthenticated.value) {
+      return navigateTo({
+        path: LOGIN_PAGE_PATH,
+        query: {
+          redirect: to.fullPath,
+          reason: "unauthorized",
+        },
+      });
     }
 
-    // 案例C: 基于角色的细粒度权限控制
-    if (
-      auth.isAuthenticated.value &&
-      to.meta.requiresAuth &&
-      to.meta.requiredRoles
-    ) {
-      const userRoles = auth.getUserRoles.value;
+    // 4. 已登录且需要认证：检查角色权限
+    if (to.meta.requiredRoles?.length) {
+      const userRoles = auth.getUserRoles.value || [];
       const requiredRoles = to.meta.requiredRoles;
 
-      // 检查用户是否拥有所需角色
-      const hasRequiredRole = requiredRoles.some((role) =>
-        userRoles.includes(role),
-      );
+      if (!hasRequiredRoles(userRoles, requiredRoles)) {
+        const errorMsg = `权限不足：需要角色 [${requiredRoles.join(", ")}]，当前角色 [${userRoles.join(", ")}]`; 
 
-      if (!hasRequiredRole) {
-        console.warn(
-          `权限不足: 需要角色 ${requiredRoles.join(", ")}, 用户角色 ${userRoles.join(", ")}`,
-        );
-
-        // 权限不足，跳转到无权限页面或首页
-        throw createError({
-          statusCode: 403,
-          statusMessage: "Forbidden: Insufficient permissions",
-        });
+        // 403 错误处理：客户端跳登录页，服务端抛 403 错误
+        if (import.meta.client) {
+          return navigateTo({
+            path: LOGIN_PAGE_PATH,
+            query: {
+              redirect: to.fullPath,
+              reason: "forbidden",
+            },
+          });
+        } else {
+          throw createError({
+            statusCode: 403,
+            statusMessage: "Forbidden: Insufficient permissions",
+            message: errorMsg,
+          });
+        }
       }
     }
   } catch (error) {
-    console.error("Auth middleware error:", error);
+    const errorMsg = `认证中间件异常：${(error as Error).message}`;
 
-    // 生产环境下更友好的错误处理 [6](@ref)
+    // 不同环境的错误处理
     if (import.meta.server) {
-      console.error("Server-side auth middleware error:", error);
+      // 服务端：抛通用 500 错误，避免暴露敏感信息
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Internal Server Error",
+        message: "认证检查失败，请稍后重试",
+      });
+    } else {
+      // 客户端：终止导航并提示用户
+      abortNavigation(errorMsg);
+      // 可选：客户端跳登录页
+      // navigateTo(LOGIN_PAGE_PATH);
     }
-
-    // 如果是权限错误，跳转到登录页
-    // if (error.statusCode === 403) {
-    //   return navigateTo({
-    //     path: "/login",
-    //     query: {
-    //       reason: "forbidden",
-    //       redirect: to.fullPath,
-    //     },
-    //   });
-    // }
-
-    return abortNavigation("Authentication check failed");
   }
 });

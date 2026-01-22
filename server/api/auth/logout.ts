@@ -2,14 +2,14 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-21 11:05:00
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-21 16:43:51
+ * @LastEditTime: 2026-01-22 10:14:40
  * @FilePath: /vip/server/api/auth/logout.ts
  * @Description: 后台退出接口
  */
 import { jwtVerify } from "jose";
 import type { Res, AuthRes } from "~/types/index";
 import type { Auth } from "~/types";
-import { query } from "~/server/utils/query";
+import { utilsQuery } from "~/server/utils/query";
 
 // 复用JWT密钥（与登录接口保持一致）
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
@@ -42,7 +42,7 @@ export default defineEventHandler(
         SELECT id FROM auth 
         WHERE id = ? AND username = ? AND deleted_time IS NULL
       `;
-      const userResult: Auth[] = await query(userCheckSql, [userId, username]);
+      const userResult: Auth[] = await utilsQuery(userCheckSql, [userId, username]);
       if (userResult.length !== 1) {
         throw createError({
           statusCode: 401,

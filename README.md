@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2025-12-24 08:06:59
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-15 09:47:27
+ * @LastEditTime: 2026-01-22 10:19:00
  * @FilePath: /vip/README.md
  * @Description: 项目文档
 -->
@@ -16,7 +16,6 @@
 1. 数据库名称：qb
 
 2. 数据库表设计
-
    - department 部门表
      存储部门层级结构(处级, 科级), 每个部门有一个上级部门, 根部门的上级部门 ID 为 NULL.
 
@@ -74,7 +73,7 @@
      |      id      |                            人员主键 ID(自增)                             |  无  |
      |     name     |                             人员姓名(如张三)                             |  无  |
      |    gender    |                             人员性别(男/女)                              |  无  |
-     | certificate  |  证件(json 格式数组[{type: "二代身份证", value: "342622199201280611"}])  |  无  |
+     |  credential  |  证件(json 格式数组[{type: "二代身份证", value: "342622199201280611"}])  |  无  |
      |   contact    |     联系方式(json 格式数组[{type: "手机号", value: "18545455617"}])      |  无  |
      |   address    | 联系地址(json 格式数组[{type: "房屋地址", value: "浙江省杭州市西湖区"}]) |  无  |
      | created_time |                          创建时间(默认当前时间)                          |  无  |
@@ -218,7 +217,7 @@
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '人员主键 ID',
    name VARCHAR(100) NOT NULL COMMENT '人员姓名',
    gender ENUM('男', '女') NOT NULL COMMENT '性别',
-   certificate JSON COMMENT '证件信息(JSON 格式)',
+   credential JSON COMMENT '证件信息(JSON 格式)',
    contact JSON COMMENT '联系方式(JSON 格式)',
    address JSON COMMENT '联系地址(JSON 格式)',
    created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -307,7 +306,7 @@
    FOREIGN KEY (record_id) REFERENCES record(id) ON DELETE CASCADE,
    FOREIGN KEY (tag_id) REFERENCES tag(id) ON DELETE CASCADE,
    UNIQUE KEY uk_record_tag (record_id, tag_id)
-   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='记录关联标签表';  
+   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='记录关联标签表';
 
    -- 插入部门数据(层级：1 管理员 →2 处级 →3 科级)
    INSERT INTO department (name, parent_id, level, path) VALUES
@@ -334,7 +333,7 @@
    ('言语冲突');
 
    -- 插入人员数据
-   INSERT INTO person (name, gender, certificate, contact, address) VALUES
+   INSERT INTO person (name, gender, credential, contact, address) VALUES
    ('张三', '男',
    '[{"type": "二代身份证", "value": "342622199001011111"}]',
    '[{"type": "手机号", "value": "13800138000"}]',

@@ -2,14 +2,14 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-06 08:38:45
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-21 11:04:40
+ * @LastEditTime: 2026-01-22 10:14:47
  * @FilePath: /vip/server/api/auth/validate.ts
  * @Description: Token验证接口
  */
 import { jwtVerify } from "jose";
 import type { AuthRes, Res, Time } from "~/types/index";
 import type { Auth } from "~/types";
-import { query } from "~/server/utils/query";
+import { utilsQuery } from "~/server/utils/query";
 
 // JWT密钥（与登录接口保持一致）
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
@@ -58,7 +58,7 @@ export default defineEventHandler(
         FROM auth 
         WHERE id = ? AND username = ? AND deleted_time IS NULL
       `;
-      const userResult: (Auth & Time)[] = await query(userSelectSql, [
+      const userResult: (Auth & Time)[] = await utilsQuery(userSelectSql, [
         userId,
         username,
       ]);

@@ -99,7 +99,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {
   Hide,
   Loading,
@@ -164,7 +164,7 @@ const loginFormData: {
 };
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .login-container {
   min-height: 100vh;
   display: flex;

@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-16 10:51:23
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-16 10:51:33
+ * @LastEditTime: 2026-01-22 12:51:17
  * @FilePath: /qb/server/utils/query.ts
  * @Description: 数据库查询工具函数
  */
@@ -34,11 +34,7 @@ export const getConnection = async (): Promise<Connection> => {
   try {
     return await pool.getConnection();
   } catch (error) {
-    console.error(
-      `获取数据库连接失败 [${runtimeConfig.db_aliyun.dbHost}]:`,
-      error
-    );
-    throw new Error(`数据库连接失败 [${runtimeConfig.db_aliyun.dbHost}]`);
+    throw new Error(`数据库连接失败 [${runtimeConfig.db_aliyun.dbHost}]: ${error}`);
   }
 };
 
@@ -48,7 +44,7 @@ export const getConnection = async (): Promise<Connection> => {
  * @param params 参数数组
  * @returns 查询结果（泛型类型，由调用方指定）
  */
-export async function query<T = any>(
+export async function utilsQuery<T = any>(
   sql: string,
   params: any[] = []
 ): Promise<T[]> {
@@ -58,7 +54,6 @@ export async function query<T = any>(
     const result: T[] = await conn.query<T[]>(sql, params);
     return result;
   } catch (error) {
-    console.error(`数据库查询失败 [${sql}]:`, error);
     throw new Error(`数据库查询失败: ${(error as Error).message}`);
   } finally {
     if (conn) conn.end();
@@ -71,9 +66,7 @@ export async function query<T = any>(
 export const closePool = async (): Promise<void> => {
   try {
     await pool.end();
-    console.log("数据库连接池已关闭");
   } catch (error) {
-    console.error("关闭连接池失败:", error);
     throw error;
   }
 };

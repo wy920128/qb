@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-15 15:12:18
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-21 13:52:16
+ * @LastEditTime: 2026-01-22 12:49:07
  * @FilePath: /qb/composables/useAuth.ts
  * @Description: 认证 Composable 主模块
  */
@@ -98,14 +98,12 @@ export const useAuth = () => {
       if (response.code === 200 && response.success && response.data.list[0]) {
         const userData = response.data.list[0];
         setAuthState(userData, userData.token, loginData.expiresIn);
-        console.log(`登录成功:`, userData.username);
         ElMessage.success(`登录成功! ${userData.username}`);
         return true;
       } else {
         throw new Error(response.message || `登录失败`);
       }
     } catch (error: any) {
-      console.error(`登录错误: ${error.message}`);
       ElMessage.error(`登录错误: ${error.message}`);
       clearAuth();
       return false;
@@ -124,7 +122,7 @@ export const useAuth = () => {
         });
       }
     } catch (error) {
-      console.error(`退出登录 API 错误:`, error);
+      ElMessage.error(`退出登录 API 错误: ${error}`);
     } finally {
       clearAuth();
       if (import.meta.client) {
@@ -151,7 +149,7 @@ export const useAuth = () => {
         return false;
       }
     } catch (error) {
-      console.error(`Token 验证失败:`, error);
+      ElMessage.error(`Token 验证失败: ${error}`);
       clearAuth();
       return false;
     }
@@ -202,7 +200,7 @@ export const useAuth = () => {
         );
       }
     } catch (error) {
-      console.error(`更新用户信息失败:`, error);
+      ElMessage.error(`更新用户信息失败: ${error}`);
       throw error;
     }
   };
