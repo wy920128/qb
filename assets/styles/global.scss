@@ -1,0 +1,123 @@
+// ===================== 全局变量定义（拆分独立变量，规避map兼容问题） =====================
+// 颜色变量
+$primary-color: #409eff;
+$success-color: #67c23a;
+$warning-color: #e6a23c;
+$danger-color: #f56c6c;
+$info-color: #909399;
+$border-color: #dcdfe6;
+$bg-color: #f5f7fa;
+$text-color: #303133;
+$card-bg: #ffffff;
+$scrollbar-track: #f1f1f1;
+$scrollbar-thumb: #c1c1c1;
+$scrollbar-thumb-hover: #a8a8a8;
+
+// 尺寸变量
+$card-radius: 8px;
+$card-padding: 20px;
+$card-mb: 20px;
+$btn-group-gap: 8px;
+$scrollbar-size: 6px;
+$scrollbar-radius: 3px;
+
+// 阴影变量
+$card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+$card-shadow-hover: 0 2px 6px rgba(0, 0, 0, 0.15);
+
+// 响应式断点
+$mobile-breakpoint: 768px;
+$table-min-width: 600px;
+
+// 把SCSS变量同步到CSS :root（方便组件内通过var()直接使用）
+:root {
+  --primary-color: #{$primary-color};
+  --success-color: #{$success-color};
+  --warning-color: #{$warning-color};
+  --danger-color: #{$danger-color};
+  --info-color: #{$info-color};
+  --border-color: #{$border-color};
+  --bg-color: #{$bg-color};
+}
+
+// ===================== 混合宏（复用性逻辑封装） =====================
+// 1. 自定义滚动条混合宏（可全局复用，也可单独给某元素调用）
+@mixin custom-scrollbar {
+  ::-webkit-scrollbar {
+    width: $scrollbar-size;
+    height: $scrollbar-size;
+  }
+  ::-webkit-scrollbar-track {
+    background: $scrollbar-track;
+    border-radius: $scrollbar-radius;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: $scrollbar-thumb;
+    border-radius: $scrollbar-radius;
+    &:hover {
+      background: $scrollbar-thumb-hover;
+    }
+  }
+}
+
+// 2. 响应式混合宏（移动端断点封装）
+@mixin mobile-only {
+  @media (max-width: $mobile-breakpoint) {
+    @content;
+  }
+}
+
+// ===================== 基础样式 =====================
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  line-height: 1.6;
+  color: $text-color;
+  background-color: $bg-color;
+  // 全局应用自定义滚动条
+  @include custom-scrollbar;
+}
+
+// ===================== 通用复用样式 =====================
+// 通用卡片样式
+.common-card {
+  background: $card-bg;
+  border-radius: $card-radius;
+  padding: $card-padding;
+  margin-bottom: $card-mb;
+  box-shadow: $card-shadow;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: $card-shadow-hover;
+  }
+}
+
+// 按钮组样式（修复原CSS重复定义的问题）
+.btn-group {
+  display: flex;
+  gap: $btn-group-gap;
+  flex: 1;
+}
+
+// ===================== 表格响应式样式 =====================
+.table-responsive {
+  @include mobile-only {
+    overflow-x: auto;
+  }
+
+  .data-table {
+    @include mobile-only {
+      min-width: $table-min-width;
+    }
+  }
+}

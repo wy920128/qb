@@ -255,7 +255,6 @@ const handleDetail = (row: PersonVO) => {
 const checkAuthStatus = () => {
   const userId = getCurrentUserId();
   if (!userId) {
-    ElMessage.warning("用户未登录或登录已过期");
     return false;
   }
   currentUserId.value = userId;
@@ -268,7 +267,6 @@ const init = async () => {
   if (!checkAuthStatus()) {
     return;
   }
-
   await searchForm.fnc_init(); // 初始化分类数据
   await searchForm.btn_search(); // 初始加载人员数据
 };
@@ -473,7 +471,13 @@ onMounted(async () => {
             <!-- 标签信息列自定义显示 -->
             <template v-else-if="col.prop === 'record_tag'" #default="{ row }">
               <div class="record-tag-container">
-                <template v-if="row.record_tag && row.record_tag.length > 0 && row.record_tag[0].tag_name">
+                <template
+                  v-if="
+                    row.record_tag &&
+                    row.record_tag.length > 0 &&
+                    row.record_tag[0].tag_name
+                  "
+                >
                   <div
                     v-for="(tagInfo, index) in row.record_tag"
                     :key="index"
@@ -518,192 +522,168 @@ onMounted(async () => {
         @current-change="paginationData.func_currentChange"
       />
     </div>
-
-    <!-- 空状态提示 -->
-    <div
-      v-if="!tableData.loading && tableData.list.length === 0"
-      class="empty-tip"
-    >
-      <el-empty description="暂无重点人员数据" />
-    </div>
-
-    <!-- 未登录提示 -->
-    <div v-if="!currentUserId" class="auth-tip">
-      <el-alert
-        title="用户未登录"
-        type="error"
-        description="请先登录系统以获取分类数据"
-        show-icon
-        :closable="false"
-      />
-    </div>
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+$base-padding: 20px;
+$mobile-breakpoint: 768px;
+$gray-light: #909399;
+$border-radius: 8px;
 .person-list-container {
-  padding: 20px;
-  background: #f5f7fa;
-  min-height: 100vh;
-}
+  padding: $base-padding;
 
-.search-section {
-  margin-bottom: 20px;
-}
+  // 搜索区域
+  .search-section {
+    margin-bottom: $base-padding;
 
-.search-card {
-  border-radius: 8px;
-}
+    .search-card {
+      border-radius: $border-radius;
 
-.search-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+      .search-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
 
-.search-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #303133;
-}
+        .search-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: #303133;
+        }
+      }
 
-.search-form {
-  width: 100%;
-}
+      .search-form {
+        width: 100%;
 
-.select-tip {
-  margin-top: 5px;
-}
+        .select-tip {
+          margin-top: 5px;
+        }
 
-.action-buttons {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.table-section {
-  margin-bottom: 20px;
-}
-
-.table-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.table-title {
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.table-total {
-  font-size: 14px;
-  color: #909399;
-}
-
-.pagination-section {
-  display: flex;
-  justify-content: center;
-  padding: 20px;
-  background: #ffffff;
-  border-radius: 8px;
-}
-
-.empty-tip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  background: #ffffff;
-  border-radius: 8px;
-  margin-top: 20px;
-}
-
-.auth-tip {
-  margin-top: 20px;
-}
-
-.credential-cell,
-.classify-cell {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.credential-cell span,
-.classify-cell span {
-  flex: 1;
-  word-break: break-word;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .person-list-container {
-    padding: 12px;
+        .action-buttons {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+      }
+    }
   }
 
-  .action-buttons {
+  // 表格区域
+  .table-section {
+    margin-bottom: $base-padding;
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .table-title {
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .table-total {
+        font-size: 14px;
+        color: $gray-light;
+      }
+    }
+  }
+
+  // 分页区域
+  .pagination-section {
+    display: flex;
+    justify-content: center;
+    padding: $base-padding;
+    background: #ffffff;
+    border-radius: $border-radius;
+  }
+
+  // 空状态/未登录提示
+  .empty-tip {
+    display: flex;
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
+    justify-content: center;
+    padding: 60px $base-padding;
+    background: #ffffff;
+    border-radius: $border-radius;
+    margin-top: $base-padding;
   }
 
-  .action-buttons .el-button {
-    margin-bottom: 8px;
-    width: 100%;
+  .auth-tip {
+    margin-top: $base-padding;
   }
 
-  .table-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
+  // 单元格样式
   .credential-cell,
   .classify-cell {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    span {
+      flex: 1;
+      word-break: break-word;
+    }
   }
-}
 
-/* 对话框样式 */
-:deep(.credential-dialog) {
-  max-width: 500px;
-}
-
-:deep(.classify-dialog) {
-  max-width: 400px;
-}
-
-.classify-tags-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  align-items: center;
-}
-
-.classify-tag {
-  margin: 1px;
-  white-space: nowrap;
-}
-
-.no-classify-tip {
-  color: #909399;
-  font-size: 12px;
-  font-style: italic;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
+  // 分类标签容器
   .classify-tags-container {
-    gap: 2px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+
+    .classify-tag {
+      margin: 1px;
+      white-space: nowrap;
+    }
+
+    .no-classify-tip {
+      color: $gray-light;
+      font-size: 12px;
+      font-style: italic;
+    }
   }
 
-  .classify-tag {
-    font-size: 10px;
-    padding: 2px 6px;
+  // 响应式样式（合并所有移动端规则，避免重复）
+  @media (max-width: $mobile-breakpoint) {
+    padding: 12px;
+
+    .action-buttons {
+      flex-direction: column;
+      align-items: stretch;
+
+      .el-button {
+        margin-bottom: 8px;
+        width: 100%;
+      }
+    }
+
+    .table-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .credential-cell,
+    .classify-cell {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .classify-tags-container {
+      gap: 2px;
+
+      .classify-tag {
+        font-size: 10px;
+        padding: 2px 6px;
+      }
+    }
   }
 }
+
+// 移除冗余的:deep穿透（模板中无对应对话框，无实际作用）
 </style>

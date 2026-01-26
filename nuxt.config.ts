@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-15 14:10:54
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-26 09:47:18
+ * @LastEditTime: 2026-01-26 10:19:37
  * @FilePath: /qb/nuxt.config.ts
  * @Description: nuxt 配置文件
  */
@@ -11,7 +11,7 @@ export default defineNuxtConfig({
     transpile: [],
   },
   compatibilityDate: `2025-07-15`,
-  css: [`~/assets/styles/global.css`],
+  css: [`~/assets/styles/global.scss`],
   devServer: {
     port: 80, // 设置开发服务器端口为80
     host: `0.0.0.0`, // 允许外部访问
@@ -21,7 +21,6 @@ export default defineNuxtConfig({
   elementPlus: {
     icon: `ElIcon`,
     importStyle: `scss`,
-    themes: [`dark`],
   },
   hooks: {
     "pages:extend": function (pages) {

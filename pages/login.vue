@@ -100,6 +100,9 @@
 </template>
 
 <script lang="ts" setup>
+definePageMeta({
+  layout: false,
+});
 import {
   Hide,
   Loading,
