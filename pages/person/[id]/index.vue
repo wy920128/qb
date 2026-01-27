@@ -14,7 +14,7 @@
           刷新数据
         </el-button>
         <el-button
-          type="success"
+          type="primary"
           :icon="Printer"
           @click="handlePrint"
           class="action-btn"
@@ -47,9 +47,6 @@
         border
         class="info-descriptions"
       >
-        <el-descriptions-item label="人员ID" class="desc-item">
-          <span class="desc-value">{{ personData.id || "暂无" }}</span>
-        </el-descriptions-item>
         <el-descriptions-item label="姓名" class="desc-item">
           <span class="desc-value name-value">{{
             personData.name || "暂无"
@@ -57,7 +54,7 @@
         </el-descriptions-item>
         <el-descriptions-item label="性别" class="desc-item">
           <el-tag
-            :type="personData.gender === '男' ? 'primary' : 'danger'"
+            :type="personData.gender === `男` ? `success` : `danger`"
             effect="plain"
             class="gender-tag"
           >
@@ -67,16 +64,6 @@
         <el-descriptions-item label="出生日期" class="desc-item">
           <span class="desc-value">{{
             formatDate(personData.birthday) || "暂无"
-          }}</span>
-        </el-descriptions-item>
-        <el-descriptions-item label="创建时间" class="desc-item">
-          <span class="desc-value">{{
-            formatDate(personData.created_time) || "暂无"
-          }}</span>
-        </el-descriptions-item>
-        <el-descriptions-item label="更新时间" class="desc-item">
-          <span class="desc-value">{{
-            formatDate(personData.updated_time) || "暂无"
           }}</span>
         </el-descriptions-item>
         <el-descriptions-item
@@ -89,14 +76,24 @@
             <el-tag
               v-for="(classify, index) in personData.classify"
               :key="index"
-              type="info"
-              size="small"
+              type="danger"
+              size="default"
               class="classify-tag"
-              effect="plain"
+              effect="dark"
             >
               {{ classify }}
             </el-tag>
           </div>
+        </el-descriptions-item>
+        <el-descriptions-item label="创建时间" class="desc-item">
+          <span class="desc-value">{{
+            formatDate(personData.created_time) || "暂无"
+          }}</span>
+        </el-descriptions-item>
+        <el-descriptions-item label="更新时间" class="desc-item">
+          <span class="desc-value">{{
+            formatDate(personData.updated_time) || "暂无"
+          }}</span>
         </el-descriptions-item>
       </el-descriptions>
     </el-card>
@@ -124,7 +121,7 @@
                 class="info-item"
                 hover
               >
-                <el-tag type="info" size="small" class="info-type-tag"
+                <el-tag type="primary" size="small" class="info-type-tag"
                   >{{ cred.type }}:</el-tag
                 >
                 <span class="info-value">{{ cred.value }}</span>
@@ -149,7 +146,7 @@
                 class="info-item"
                 hover
               >
-                <el-tag type="success" size="small" class="info-type-tag"
+                <el-tag type="primary" size="small" class="info-type-tag"
                   >{{ contact.type }}:</el-tag
                 >
                 <span class="info-value">{{ contact.value }}</span>
@@ -174,7 +171,7 @@
                 class="info-item"
                 hover
               >
-                <el-tag type="warning" size="small" class="info-type-tag"
+                <el-tag type="primary" size="small" class="info-type-tag"
                   >{{ addr.type }}:</el-tag
                 >
                 <span class="info-value">{{ addr.value }}</span>
@@ -220,13 +217,14 @@
         :element-loading-background="`rgba(255, 255, 255, 0.8)`"
       >
         <el-table-column
+          align="center"
           prop="id"
           label="记录ID"
           width="80"
-          align="center"
           class-name="table-col-id"
         />
         <el-table-column
+          align="center"
           prop="content"
           label="记录内容"
           min-width="300"
@@ -234,10 +232,10 @@
           class-name="table-col-content"
         />
         <el-table-column
+          align="center"
           prop="created_time"
           label="创建时间"
           width="180"
-          align="center"
           class-name="table-col-time"
         >
           <template #default="{ row }">
@@ -245,6 +243,7 @@
           </template>
         </el-table-column>
         <el-table-column
+          align="center"
           label="关联标签"
           min-width="150"
           class-name="table-col-tags"
@@ -399,7 +398,7 @@ const formatDate = (dateString: TimeStamp) => {
 // 刷新功能
 const handleRefresh = () => {
   loadPersonData();
-  ElMessage.success("数据已刷新");
+  ElMessage.primary("数据已刷新");
 };
 
 // 分页处理

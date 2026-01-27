@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-16 10:51:23
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-22 12:51:17
+ * @LastEditTime: 2026-01-26 16:17:01
  * @FilePath: /qb/server/utils/query.ts
  * @Description: 数据库查询工具函数
  */

@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-15 15:12:18
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-22 12:49:07
+ * @LastEditTime: 2026-01-27 08:24:59
  * @FilePath: /qb/composables/useAuth.ts
  * @Description: 认证 Composable 主模块
  */
@@ -113,21 +113,27 @@ export const useAuth = () => {
   };
   const logout = async (): Promise<void> => {
     try {
+      await ElMessageBox.confirm(`确定要退出登录吗?`, `提示`, {
+        confirmButtonText: `确定`,
+        cancelButtonText: `取消`,
+        type: `warning`,
+        customClass: `logout-confirm-dialog`,
+      });
       if (authState.value.token) {
         await $fetch(`/api/auth/logout`, {
           method: `POST`,
-          headers: {
-            Authorization: `Bearer ${authState.value.token}`,
-          },
+          headers: { Authorization: `Bearer ${authState.value.token}` },
         });
       }
-    } catch (error) {
-      ElMessage.error(`退出登录 API 错误: ${error}`);
-    } finally {
       clearAuth();
+      ElMessage.success(`退出登录成功`);
       if (import.meta.client) {
         await navigateTo(`/login`);
       }
+    } catch (error) {
+      if (error === `cancel`) return;
+      console.error(`退出登录失败:`, error);
+      ElMessage.error(`退出登录失败，请重试`);
     }
   };
   const validateToken = async (token?: string): Promise<boolean> => {
@@ -204,8 +210,8 @@ export const useAuth = () => {
       throw error;
     }
   };
-  const hasPermission = (permission: string): boolean => {
-    return authState.value.user?.role.includes(permission) || false;
+  const hasRole = (role: string): boolean => {
+    return authState.value.user?.role.includes(role) || false;
   };
   return {
     state: readonly(authState),
@@ -220,7 +226,7 @@ export const useAuth = () => {
     validateToken,
     refreshToken,
     updateUser,
-    hasPermission,
+    hasRole,
     initializeAuth,
     clearAuth,
   };

@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-06 08:38:45
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-22 12:50:54
+ * @LastEditTime: 2026-01-26 16:22:07
  * @FilePath: /vip/server/api/auth2classify/index.get.ts
  * @Description: 根据auth_id获取用户关联分类接口 - 已修正
  */
@@ -22,34 +22,42 @@ export default defineEventHandler(
     try {
       // 1. 获取并验证查询参数
       const queryParams = getQuery(event);
-      const { auth_id } = queryParams;
-      if (!auth_id || auth_id === "") {
-        throw createError({
-          statusCode: 400,
-          statusMessage: `用户ID不能为空`,
-        });
-      }
-      const userId = Number(auth_id);
-      if (isNaN(userId) || userId <= 0) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: `用户ID格式无效`,
-        });
-      }
+      // const { auth_id } = queryParams;
+      // if (!auth_id || auth_id === ``) {
+      //   throw createError({
+      //     statusCode: 400,
+      //     statusMessage: `用户ID不能为空`,
+      //   });
+      // }
+      // const userId = Number(auth_id);
+      // if (isNaN(userId) || userId <= 0) {
+      //   throw createError({
+      //     statusCode: 400,
+      //     statusMessage: `用户ID格式无效`,
+      //   });
+      // }
+      // const sql = `
+      //   SELECT 
+      //     c.id,
+      //     c.name
+      //   FROM auth2classify ac
+      //   INNER JOIN classify c ON ac.classify_id = c.id 
+      //     AND c.deleted_time IS NULL
+      //   WHERE ac.auth_id = ? 
+      //     AND ac.deleted_time IS NULL
+      //   ORDER BY c.name ASC
+      // `;
       const sql = `
         SELECT 
           c.id,
           c.name
-        FROM auth2classify ac
-        INNER JOIN classify c ON ac.classify_id = c.id 
-          AND c.deleted_time IS NULL
-        WHERE ac.auth_id = ? 
-          AND ac.deleted_time IS NULL
+        FROM  classify c
+      WHERE c.deleted_time IS NULL
         ORDER BY c.name ASC
       `;
-      const params = [userId];
+      // const params = [userId];
       // 3. 执行查询
-      const result: Classify[] = await utilsQuery(sql, params);
+      const result: Classify[] = await utilsQuery(sql, /* params */);
       // 4. 处理查询结果
       return {
         code: 200,

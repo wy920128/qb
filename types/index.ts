@@ -2,10 +2,16 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-15 14:21:23
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-20 08:10:37
+ * @LastEditTime: 2026-01-27 14:24:19
  * @FilePath: /qb/types/index.ts
  * @Description: types/index 通用类型
  */
+declare module "#app" {
+  interface PageMeta {
+    requiresAuth?: boolean;
+    requiredRoles?: string[];
+  }
+}
 /**
  * 分页查询参数接口 (通常与Res配合使用)
  */
@@ -60,6 +66,7 @@ export * from "./auth2person";
 export * from "./classify";
 export * from "./classify2person";
 export * from "./department";
+export * from "./menu";
 export * from "./person";
 export * from "./person2record";
 export * from "./record";

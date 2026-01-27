@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-15 14:10:54
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-26 10:19:37
+ * @LastEditTime: 2026-01-27 14:29:04
  * @FilePath: /qb/nuxt.config.ts
  * @Description: nuxt 配置文件
  */
@@ -22,15 +22,11 @@ export default defineNuxtConfig({
     icon: `ElIcon`,
     importStyle: `scss`,
   },
-  hooks: {
-    "pages:extend": function (pages) {
-      pages.unshift({
-        name: `index`,
-        path: `/`,
-        redirect: `/person/list`,
-      });
-    },
-  },
+  // routeRules: {
+  //   "\/": {
+  //     redirect: `/person/list`,
+  //   },
+  // },
   runtimeConfig: {
     server: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || `/api`,
@@ -48,6 +44,13 @@ export default defineNuxtConfig({
       dbUser: process.env.DB_ALY_USER,
       dbPassword: process.env.DB_ALY_PASSWORD,
       dbName: process.env.DB_ALY_NAME,
+    },
+    db_gaw: {
+      dbHost: process.env.DB_GAW_HOST,
+      dbPort: process.env.DB_GAW_PORT,
+      dbUser: process.env.DB_GAW_USER,
+      dbPassword: process.env.DB_GAW_PASSWORD,
+      dbName: process.env.DB_GAW_NAME,
     },
   },
 });
