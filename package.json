@@ -21,6 +21,6 @@
   },
   "devDependencies": {
     "@element-plus/nuxt": "^1.1.4",
-    "sass-embedded": "^1.97.2"
+    "sass": "^1.97.3"
   }
 }

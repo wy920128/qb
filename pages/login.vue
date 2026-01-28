@@ -168,9 +168,6 @@ const loginFormData: {
 </script>
 
 <style lang="scss" scoped>
-// 引入全局样式变量/混合宏（若已全局注入可删除此行）
-@import "@/styles/global.scss";
-
 /* 页面容器：复用全局flex-center混合宏，替换硬编码颜色/间距 */
 .login-container {
   min-height: 100vh;
