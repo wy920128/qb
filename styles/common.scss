@@ -2,106 +2,132 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-15 15:14:24
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-28 09:37:37
+ * @LastEditTime: 2026-01-28 10:25:17
  * @FilePath: /qb/styles/common.scss
  * @Description: 全局通用样式定义
  */
-@use "./variables" as *;
+@use "./index.scss" as *;
 
-@mixin custom-scrollbar {
-  &::-webkit-scrollbar {
-    width: $scrollbar-size;
-    height: $scrollbar-size;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-family;
+  font-size: $font-size-md;
+  color: $text-primary;
+  background-color: #fff;
+}
+
+// 通用布局样式
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 $spacing-md;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// 通用按钮样式
+.btn {
+  display: inline-block;
+  padding: 8px $spacing-md;
+  border-radius: $border-radius-md;
+  border: none;
+  font-size: $font-size-md;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
   }
-  &::-webkit-scrollbar-track {
-    background: $scrollbar-track;
-    border-radius: $scrollbar-radius;
+
+  &--primary {
+    background-color: $primary-color;
+    color: #fff;
   }
-  &::-webkit-scrollbar-thumb {
-    background: $scrollbar-thumb;
-    border-radius: $scrollbar-radius;
-    &:hover {
-      background: $scrollbar-thumb-hover;
+
+  &--default {
+    background-color: #fff;
+    color: $text-primary;
+    border: 1px solid $border-color;
+  }
+
+  &--danger {
+    background-color: $danger-color;
+    color: #fff;
+  }
+
+  &--block {
+    display: block;
+    width: 100%;
+  }
+}
+
+// 通用表单样式
+.form-item {
+  margin-bottom: $spacing-md;
+
+  &__label {
+    display: block;
+    margin-bottom: $spacing-sm;
+    color: $text-primary;
+    font-weight: 500;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 8px $spacing-sm;
+    border: 1px solid $border-color;
+    border-radius: $border-radius-md;
+    font-size: $font-size-md;
+    color: $text-primary;
+    outline: none;
+
+    &:focus {
+      border-color: $primary-color;
+    }
+
+    &::placeholder {
+      color: $text-placeholder;
     }
   }
 }
-@mixin mobile-only {
-  @media (max-width: $mobile-breakpoint) {
-    @content;
-  }
+
+// 通用卡片样式
+.card {
+  background-color: #fff;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+  padding: $spacing-md;
 }
-@mixin text-ellipsis {
+
+// 通用文本样式
+.text-ellipsis {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-@mixin text-multi-ellipsis($lines: 2) {
-  display: -webkit-box;
-  -webkit-line-clamp: $lines;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-@mixin flex-layout($justify: center, $align: center, $wrap: nowrap) {
-  display: flex;
-  justify-content: $justify;
-  align-items: $align;
-  flex-wrap: $wrap;
-}
-@mixin card-hover-effect {
-  box-shadow: $card-shadow;
-  transition: box-shadow 0.3s ease;
-  &:hover {
-    box-shadow: $card-shadow-hover;
-  }
-}
-html,
-body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  line-height: 1.6;
-  color: $text-color;
-  background-color: $bg-color;
-  @include custom-scrollbar;
-}
-.common-card {
-  background: $card-bg;
-  border-radius: $card-radius;
-  padding: $card-padding;
-  margin-bottom: $card-mb;
-  @include card-hover-effect;
-  &.card-sm {
-    padding: $margin-sm;
-    border-radius: 4px;
-  }
-  &.card-lg {
-    padding: $margin-lg;
-    border-radius: 12px;
-  }
-}
-.common-input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid $border-color;
-  border-radius: 4px;
-  transition: border-color 0.3s ease;
-  &:focus {
-    outline: none;
-    border-color: $primary-color;
-    box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
-  }
-}
-.btn-group {
-  @include flex-layout(flex-start, center, nowrap);
-  gap: $btn-group-gap;
-  flex: 1;
-}
-.text-ellipsis {
-  @include text-ellipsis;
-}
-.mb-md {
-  margin-bottom: $margin-md;
+
+// 页面通用间距
+.page-margin {
+  margin-top: $spacing-lg;
+  margin-bottom: $spacing-lg;
 }

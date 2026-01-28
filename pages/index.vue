@@ -259,167 +259,23 @@ watch(
 </script>
 
 <style scoped lang="scss">
-/* 页面容器：仅保留专属间距，复用全局变量 */
-.home-container {
-  padding: $gap-lg; // 复用全局间距变量
-  max-width: 800px;
-  margin: 0 auto;
-}
+.index-banner {
+  height: 200px;
+  background-color: $bg-color;
+  border-radius: $border-radius-lg;
+  margin-bottom: $spacing-lg;
 
-/* 加载态：复用全局 flex-center 混合宏，删除重复的 flex 居中代码 */
-.loading {
-  @include flex-center; // 复用全局弹性居中混合宏
-  flex-direction: column; // 仅保留专属的列布局
-  padding: $margin-lg;
-  color: $info-color; // 复用全局文本颜色变量
-}
-
-/* 加载动画：保留页面专属的 spinner 动画 */
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid $primary-color; // 复用全局主色变量
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: $gap-md; // 复用全局间距变量
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
+  .banner-title {
+    font-size: $font-size-lg;
+    color: $primary-color;
   }
 }
 
-/* 认证数据卡片：复用 global 的 .common-card 类，仅保留专属样式 */
-.cookie-data {
-  margin-top: $margin-md; // 复用全局间距变量
-  // 卡片基础样式（背景/圆角/内边距/阴影）已由 .common-card 提供，删除重复定义
-}
-
-.cookie-data h3 {
-  margin-top: 0;
-  color: $text-color; // 复用全局文本颜色变量
-  border-bottom: 1px solid $border-color; // 复用全局边框色变量
-  padding-bottom: $gap-sm; // 复用全局间距变量
-}
-
-/* 数据项：保留页面专属布局逻辑 */
-.data-item {
-  display: flex;
-  margin: $gap-md 0; // 复用全局间距变量
-  line-height: 1.6;
-}
-
-.label {
-  font-weight: bold;
-  width: 180px;
-  color: $text-color; // 复用全局文本颜色变量
-  flex-shrink: 0;
-}
-
-.value {
-  flex: 1;
-  color: $info-color; // 复用全局文本颜色变量
-  word-break: break-all;
-}
-
-/* 原始数据块：保留页面专属样式，复用全局变量 */
-.raw-data {
-  margin-top: $margin-md; // 复用全局间距变量
-  flex-direction: column;
-  background-color: $card-bg; // 复用全局卡片背景色变量
-  padding: $gap-md; // 复用全局间距变量
-  border-radius: 4px;
-  border: 1px solid $border-color; // 复用全局边框色变量
-}
-
-.raw-data .label {
-  margin-bottom: $gap-sm; // 复用全局间距变量
-}
-
-.raw-data pre {
-  margin: 0;
-  padding: $gap-sm; // 复用全局间距变量
-  background-color: $bg-color; // 复用全局背景色变量
-  overflow-x: auto;
-  font-size: $font-size-md; // 复用全局字体大小变量
-  border-radius: 4px;
-  // 滚动条样式已由 global 的 custom-scrollbar 全局提供，删除重复定义
-}
-
-/* 操作按钮组：保留专属布局，精简按钮样式 */
-.action-buttons {
-  margin-top: $margin-md; // 复用全局间距变量
-  display: flex;
-  gap: $gap-md; // 复用全局间距变量
-}
-
-.logout-btn,
-.refresh-btn {
-  padding: $gap-sm $gap-md; // 复用全局间距变量
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: $font-size-md; // 复用全局字体大小变量
-  transition: background-color 0.3s ease; // 统一过渡动画
-  color: $card-bg; // 复用全局卡片背景色（白色）
-}
-
-.logout-btn {
-  background-color: $danger-color; // 复用全局危险色变量
-  &:hover {
-    background-color: darken($danger-color, 10%); // 基于全局变量调整 hover 色
-  }
-}
-
-.refresh-btn {
-  background-color: $primary-color; // 复用全局主色变量
-  &:hover {
-    background-color: darken($primary-color, 10%); // 基于全局变量调整 hover 色
-  }
-  &:disabled {
-    background-color: $info-color; // 复用全局信息色变量
-    cursor: not-allowed;
-    opacity: 0.7;
-  }
-}
-
-/* 无数据提示：保留专属样式，复用全局变量 */
-.no-data {
-  margin-top: $margin-md; // 复用全局间距变量
-  color: $info-color; // 复用全局文本颜色变量
-  padding: $gap-lg; // 复用全局间距变量
-  border: 1px dashed $border-color; // 复用全局边框色变量
-  border-radius: $card-radius; // 复用全局卡片圆角变量
-  text-align: center;
-}
-
-.login-link {
-  color: $primary-color; // 复用全局主色变量
-  text-decoration: none;
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-/* 响应式：复用 global 的 mobile-only 混合宏，删除重复的媒体查询代码 */
-@include mobile-only {
-  .home-container {
-    padding: $gap-sm; // 复用全局间距变量
-  }
-  .data-item {
-    flex-direction: column;
-  }
-  .label {
-    width: 100%;
-    margin-bottom: $gap-sm; // 复用全局间距变量
-  }
-  .action-buttons {
-    flex-direction: column;
+.index-card-list {
+  gap: $spacing-md;
+  .card {
+    flex: 1;
+    min-width: 200px;
   }
 }
 </style>

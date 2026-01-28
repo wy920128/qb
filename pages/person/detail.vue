@@ -402,86 +402,28 @@ defineExpose({
   close,
 });
 </script>
-<style scoped>
-.person-detail-drawer {
-  :deep(.el-drawer) {
-    border-radius: 8px 0 0 8px;
+<style scoped lang="scss">
+.person-info {
+  padding: $spacing-xl;
+
+  .info-title {
+    font-size: $font-size-lg;
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-sm;
+    border-bottom: 1px solid $border-color;
   }
-  :deep(.el-drawer__header) {
-    margin-bottom: 0;
-    padding: 20px 24px;
-    border-bottom: 1px solid #e8e8e8;
-    .el-drawer__title {
-      font-size: 18px;
-      font-weight: 600;
-      color: #303133;
+
+  .info-item {
+    margin-bottom: $spacing-sm;
+    .info-label {
+      color: $text-regular;
+      width: 80px;
+      display: inline-block;
     }
   }
-  :deep(.el-drawer__body) {
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    overflow-y: auto;
-  }
-  :deep(.el-drawer__footer) {
-    padding: 16px 24px;
-    border-top: 1px solid #e8e8e8;
-  }
-}
-.person-detail-container {
-  padding: 24px;
-  flex: 1;
-  overflow-y: auto;
-}
-.card-header {
-  display: flex;
-  align-items: center;
-}
-.card-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #303133;
-}
-.info-array-container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.info-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 0;
-}
-.empty-state {
-  padding: 40px 0;
-  text-align: center;
-}
-.desc-value.name-value {
-  font-weight: 600;
-  color: #409eff;
-}
-.drawer-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-/* 确保内容区域在抽屉内正确显示 */
-.basic-info-card,
-.contact-info-card,
-.records-card {
-  margin-bottom: 16px;
-}
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .person-detail-container {
-    padding: 16px;
-  }
-  .person-detail-drawer {
-    :deep(.el-drawer) {
-      width: 100% !important;
-    }
+
+  .btn {
+    margin-top: $spacing-md;
   }
 }
 </style>
