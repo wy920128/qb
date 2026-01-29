@@ -2,11 +2,10 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-22 09:05:01
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-27 10:19:58
+ * @LastEditTime: 2026-01-29 10:01:11
  * @FilePath: /qb/layouts/default.vue
  * @Description: 布局 - 默认
 -->
-<!-- layouts/default.vue -->
 <template>
   <div class="common-layout">
     <el-container class="layout-container">

@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-15 14:10:54
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-28 10:25:43
+ * @LastEditTime: 2026-01-29 10:00:24
  * @FilePath: /qb/nuxt.config.ts
  * @Description: nuxt 配置文件
  */
@@ -11,7 +11,6 @@ export default defineNuxtConfig({
     transpile: [],
   },
   compatibilityDate: `2025-07-15`,
-  css: [`~/styles/common.scss`],
   devServer: {
     port: 80, // 设置开发服务器端口为80
     host: `0.0.0.0`, // 允许外部访问
@@ -51,15 +50,6 @@ export default defineNuxtConfig({
       dbUser: process.env.DB_GAW_USER,
       dbPassword: process.env.DB_GAW_PASSWORD,
       dbName: process.env.DB_GAW_NAME,
-    },
-  },
-  vite: {
-    css: {
-      preprocessorOptions: {
-        scss: {
-          additionalData: `@use "~/styles/index.scss" as *;`,
-        },
-      },
     },
   },
 });
