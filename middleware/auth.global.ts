@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-15 16:11:25
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-27 14:50:37
+ * @LastEditTime: 2026-01-30 10:34:35
  * @FilePath: /qb/middleware/auth.global.ts
  * @Description: 基于 useAuth Composable 的简化版全局路由守卫
  */
@@ -121,7 +121,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     // 权限验证通过，允许访问
     return;
   } catch (error) {
-    console.error(`Auth middleware error:`, error);
     // 简化错误处理
     if (import.meta.server) {
       throw createError({

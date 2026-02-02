@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-22 09:05:01
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-29 10:01:11
+ * @LastEditTime: 2026-01-31 11:16:26
  * @FilePath: /qb/layouts/default.vue
  * @Description: 布局 - 默认
 -->
@@ -18,7 +18,6 @@
         @login="navigateToLogin"
         @settings="handleSettings"
       />
-
       <!-- 主内容区域 -->
       <el-main class="main-content">
         <Transition name="page-fade" mode="out-in">
@@ -88,7 +87,6 @@ const handleLogout = async () => {
     await router.push(`/login`);
     ElMessage.success(`退出登录成功`);
   } catch (error) {
-    console.error(`退出登录失败:`, error);
     ElMessage.error(`退出登录失败，请重试`);
   }
 };
@@ -103,19 +101,23 @@ const handleSettings = () => router.push(`/settings`);
 <style lang="scss" scoped>
 .common-layout {
   height: 100vh;
-}
-
-.layout-container {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.main-content {
-  flex: 1;
-  overflow: auto;
-  padding: 24px;
-  background: #f5f7fa;
+  .layout-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .main-content {
+    flex: 1;
+    overflow: auto;
+    padding: 24px;
+    background: $bg-color-w;
+    margin: 0 auto;
+    .page-fade-enter-from {
+      max-width: 1400px;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
 }
 
 .footer {
@@ -134,10 +136,6 @@ const handleSettings = () => router.push(`/settings`);
 }
 
 // 页面切换过渡动画
-.page-fade-enter-from {
-  opacity: 0;
-  transform: translateY(10px);
-}
 
 .page-fade-enter-active {
   transition:

@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-14 15:53:23
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-21 09:29:37
+ * @LastEditTime: 2026-02-02 09:08:39
  * @FilePath: /vip/types/auth.ts
  * @Description: types/auth 用户表
  */
@@ -11,6 +11,7 @@ import type { PageParams, Time } from ".";
 /** 用户-本体 */
 export interface Auth {
   id: number; // 用户主键ID
+  avatar?: string; // 用户头像
   username: string; // 登录用户名
   password: string; // 加密密码（前端展示时一般隐藏）
   role: string[]; // 用户角色(如superadmin=超级管理员, user1=普通用户)

@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-27 07:50:19
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-27 13:53:51
+ * @LastEditTime: 2026-02-02 09:06:25
  * @FilePath: /qb/config/menu.ts
  * @Description: 菜单配置
  */
@@ -54,7 +54,7 @@ export const menuData: {
   ],
 };
 
-export const getFilteredMenu: (user: Auth) => {
+export const getFilteredMenu: (user: Omit<Auth, "password">) => {
   header: Menu[];
   right: Menu[];
 } = (user) => {
