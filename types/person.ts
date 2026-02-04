@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2025-12-24 09:46:58
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-02-02 11:54:15
+ * @LastEditTime: 2026-02-03 16:34:12
  * @FilePath: /vip/types/person.ts
  * @Description: types/person 人员
  */
@@ -35,11 +35,11 @@ export interface Person {
 /** 用户-后端返回 */
 export interface PersonRes extends Person, Time {
   classify?: string[]; // 关联的分类名称
-  record_tag?: { tag_name: string; count: number }[]; // 关联的记录内容
   record?: RecordRes[]; // 关联的记录内容
+  record_tag?: { tag_name: string; count: number }[]; // 关联的记录内容
 }
 /** 人员表-展示用VO */
-export interface PersonVO extends Person {
+export interface PersonVO extends Person, Time {
   classify?: string | string[]; // 关联的分类名称
   record?: string[]; // 关联的记录内容
   record_tag?: { tag_name: string; count: number }[]; // 关联的记录标签名称
@@ -53,13 +53,13 @@ export interface PersonPO {
   credential: CredentialItem[]; // 证件信息(JSON数组)
   contact: ContactItem[]; // 联系方式(JSON数组)
   address: AddressItem[]; // 联系地址(JSON数组)
+  classifyIds?: number[]; // 关联的分类ID数组
 }
 /** 人员表-查询用GO（筛选条件） */
 export interface PersonGO extends PageParams {
   id?: number;
   name?: string; // 模糊查询
   gender?: `男` | `女`; // 人员性别
-  classify_id?: number; // 关联分类筛选
-  tag_id?: number; // 关联标签筛选
+  classifyIds?: number[]; // 关联分类筛选
   deleted_time?: null; // 筛选未删除数据
 }

@@ -29,6 +29,7 @@ export default defineEventHandler(async (event): Promise<Res<PersonRes[]>> => {
         p.id,
         p.name,
         p.gender,
+        p.birthday,
         p.credential,
         p.created_time,
         p.updated_time,
