@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-22 14:45:19
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-22 16:21:46
+ * @LastEditTime: 2026-02-04 16:10:59
  * @FilePath: /qb/server/api/person/[id].get.ts
  * @Description: 获取人员详细信息
  */
@@ -37,6 +37,7 @@ export default defineEventHandler(async (event): Promise<Res<PersonRes[]>> => {
         CAST(p.id AS UNSIGNED) as id,
         p.name,
         p.gender,
+        p.birthday,
         p.credential,
         p.contact,
         p.address,
@@ -66,6 +67,7 @@ export default defineEventHandler(async (event): Promise<Res<PersonRes[]>> => {
       SELECT 
         CAST(r.id AS UNSIGNED) as id,
         r.content,
+        r.flag_inJQ,
         r.created_time,
         r.updated_time,
         r.deleted_time,

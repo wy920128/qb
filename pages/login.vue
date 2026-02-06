@@ -168,18 +168,24 @@ const loginFormData: {
 </script>
 
 <style lang="scss" scoped>
-.login-card {
-  box-shadow: $shadow-md;
-  padding: $spacing-xl;
-
-  .login-title {
-    margin-bottom: $spacing-lg;
-    font-size: $font-size-lg;
-    color: $text-primary;
-  }
-
-  .login-form {
-    margin-top: $spacing-md;
+.login-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .login-card {
+    min-width: 400px;
+    box-shadow: $shadow-md;
+    padding: $spacing-xl;
+    .login-title {
+      margin-bottom: $spacing-lg;
+      font-size: $font-size-lg;
+      color: $text-primary;
+    }
+    .login-form {
+      margin-top: $spacing-md;
+    }
   }
 }
 </style>

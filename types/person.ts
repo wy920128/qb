@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2025-12-24 09:46:58
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-02-03 16:34:12
+ * @LastEditTime: 2026-02-04 16:04:16
  * @FilePath: /vip/types/person.ts
  * @Description: types/person 人员
  */
@@ -60,6 +60,7 @@ export interface PersonGO extends PageParams {
   id?: number;
   name?: string; // 模糊查询
   gender?: `男` | `女`; // 人员性别
+  birthday?: string; // 人员出生日期
   classifyIds?: number[]; // 关联分类筛选
   deleted_time?: null; // 筛选未删除数据
 }

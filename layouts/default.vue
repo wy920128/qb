@@ -2,14 +2,13 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-22 09:05:01
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-02-04 08:47:47
+ * @LastEditTime: 2026-02-04 14:18:02
  * @FilePath: /qb/layouts/default.vue
  * @Description: 布局 - 默认
 -->
 <template>
   <div class="common-layout">
     <el-container class="layout-container">
-      <!-- 头部组件 -->
       <LayoutHeader
         :cookie-data="cookieData"
         :active-menu="activeMenu"
@@ -18,13 +17,13 @@
         @login="navigateToLogin"
         @settings="handleSettings"
       />
-      <!-- 主内容区域 -->
       <el-main class="main-content">
-        <Transition name="page-fade" mode="out-in">
-          <div :key="route.fullPath" class="page-router-view">
-            <NuxtPage />
-          </div>
-        </Transition>
+        <client-only>
+          <Transition name="page-fade" mode="out-in">
+            <div :key="route.fullPath" class="page-router-view">
+              <NuxtPage />
+            </div> </Transition
+        ></client-only>
       </el-main>
       <LayoutFooter />
     </el-container>
@@ -111,58 +110,7 @@ const handleSettings = () => router.push(`/settings`);
     overflow: auto;
     padding: 24px;
     background: $bg-color-w;
-    margin: 0 auto;
-    .page-fade-enter-from {
-      max-width: 1400px;
-      opacity: 0;
-      transform: translateY(10px);
-    }
-  }
-}
-
-.footer {
-  background: #f0f2f5;
-  border-top: 1px solid #e8e8e8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 60px;
-
-  .footer-content {
-    text-align: center;
-    color: #666;
-    font-size: 14px;
-  }
-}
-
-// 页面切换过渡动画
-
-.page-fade-enter-active {
-  transition:
-    opacity 0.3s ease,
-    transform 0.3s ease;
-}
-
-.page-fade-leave-to {
-  opacity: 0;
-}
-
-.page-fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-
-// 响应式适配
-@media (max-width: 768px) {
-  .main-content {
-    padding: 16px 12px;
-  }
-
-  .footer {
-    height: 50px;
-
-    .footer-content {
-      font-size: 12px;
-    }
+    margin: 0 10%;
   }
 }
 </style>

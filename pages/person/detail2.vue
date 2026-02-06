@@ -1,11 +1,3 @@
-<!--
- * @Author: 王野 18545455617@163.com
- * @Date: 2026-01-29 09:42:05
- * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-02-05 15:00:48
- * @FilePath: /qb/pages/person/detail.vue
- * @Description: 人员详情抽屉
--->
 <template>
   <el-drawer
     :model-value="visible"
@@ -279,7 +271,6 @@
                   </template>
                 </div>
               </el-descriptions-item>
-              <!-- 联系地址 -->
               <el-descriptions-item label="联系地址" class="desc-item">
                 <div class="info-array-container">
                   <template v-if="mode === 'view'">
@@ -353,12 +344,66 @@
             </el-descriptions>
           </el-form>
         </el-card>
+        <!-- 相关记录模块 - 适配 string 类型 flag_inJQ -->
         <el-card class="records-card" shadow="hover" v-if="mode !== 'add'">
           <template #header>
             <div class="card-header">
               <span class="card-title">相关记录</span>
+              <!-- 编辑模式显示添加记录按钮 -->
+              <el-button
+                v-if="mode === 'edit'"
+                type="primary"
+                text
+                :icon="Plus"
+                @click="showAddRecordForm = true"
+                class="add-record-btn"
+              >
+                添加记录
+              </el-button>
             </div>
           </template>
+
+          <!-- 编辑模式下的新增记录表单 -->
+          <el-form
+            v-if="mode === 'edit' && showAddRecordForm"
+            ref="recordFormRef"
+            :model="newRecordForm"
+            :rules="recordFormRules"
+            inline
+            class="add-record-form"
+          >
+            <el-form-item prop="content">
+              <el-input
+                v-model="newRecordForm.content"
+                placeholder="请输入记录内容"
+                type="textarea"
+                :rows="3"
+                style="width: 600px"
+              />
+            </el-form-item>
+            <el-form-item prop="flag_inJQ">
+              <el-radio-group v-model="newRecordForm.flag_inJQ">
+                <!-- 适配 string 类型：value 为 "是"/"否" -->
+                <el-radio value="是">是</el-radio>
+                <el-radio value="否">否</el-radio>
+              </el-radio-group>
+              <span class="form-tip">是否在警情中记录</span>
+            </el-form-item>
+            <el-form-item>
+              <el-button
+                type="primary"
+                @click="handleAddRecord"
+                :loading="drawerData.status.addRecordLoading"
+              >
+                提交
+              </el-button>
+              <el-button text @click="showAddRecordForm = false"
+                >取消</el-button
+              >
+            </el-form-item>
+          </el-form>
+
+          <!-- 记录表格：直接展示 string 类型的 flag_inJQ -->
           <el-table
             v-loading="drawerData.status.loading"
             :data="pagedRecordList"
@@ -391,7 +436,8 @@
               class-name="table-col-bool"
             >
               <template #default="{ row }">
-                {{ row.flag_inJQ }}
+                <!-- 直接展示字符串值（是/否），无需转换 -->
+                {{ row.flag_inJQ || "否" }}
               </template>
             </el-table-column>
             <el-table-column
@@ -414,7 +460,7 @@
               <template #default="{ row }">
                 <div class="tag-container">
                   <el-tag
-                    v-for="tag in row.tag"
+                    v-for="tag in row.tag || []"
                     :key="tag.id"
                     type="info"
                     size="small"
@@ -488,6 +534,7 @@
     </template>
   </el-drawer>
 </template>
+
 <script setup lang="ts">
 import { reactive, ref, watch, computed, onMounted } from "vue";
 import { ElMessage, type FormInstance, type FormRules } from "element-plus";
@@ -499,10 +546,12 @@ import type {
   CredentialItem,
   ContactItem,
   AddressItem,
-  RecordRes,
   Classify,
 } from "~/types";
+// 导入 Record 相关类型（已调整 flag_inJQ 为 string 类型）
+import type { RecordRes, RecordPO } from "~/types";
 import { formatDateTime } from "~/utils/formatData.util";
+
 // ---------------------- 1. Props 定义 ----------------------
 interface Props {
   visible: boolean;
@@ -520,6 +569,7 @@ const props = withDefaults(defineProps<Props>(), {
   size: `90%`,
   classifyIds: () => [],
 });
+
 // ---------------------- 2. Emit 定义 ----------------------
 const emit = defineEmits<{
   (e: `update:visible`, value: boolean): void;
@@ -527,14 +577,48 @@ const emit = defineEmits<{
   (e: `close`): void;
   (e: `submit-success`): void;
 }>();
+
 // ---------------------- 3. 响应式数据 ----------------------
 const drawerData = reactive({
   status: {
     loading: false,
     submitLoading: false,
+    // 添加记录的加载状态
+    addRecordLoading: false,
   },
 });
 const formRef = ref<FormInstance>();
+
+// 记录表单相关响应式数据（适配 string 类型 flag_inJQ）
+const recordFormRef = ref<FormInstance>();
+const showAddRecordForm = ref(false); // 控制新增记录表单显示/隐藏
+const newRecordForm = reactive<Partial<RecordRes>>({
+  content: "",
+  flag_inJQ: "否", // 默认值改为 string 类型的 "否"
+});
+
+// 记录表单验证规则（适配 string 类型 flag_inJQ）
+const recordFormRules = reactive<FormRules>({
+  content: [
+    { required: true, message: "请输入记录内容", trigger: "blur" },
+    { min: 1, max: 500, message: "记录内容长度1-500字符", trigger: "blur" },
+  ],
+  flag_inJQ: [
+    { required: true, message: "请选择是否在警情中记录", trigger: "change" },
+    {
+      validator: (rule, value, callback) => {
+        // 验证值必须是 "是" 或 "否"
+        if (value === "是" || value === "否") {
+          callback();
+        } else {
+          callback(new Error("请选择正确的选项（是/否）"));
+        }
+      },
+      trigger: "change",
+    },
+  ],
+});
+
 const formData = reactive({
   data: {
     id: 0,
@@ -545,7 +629,7 @@ const formData = reactive({
     contact: [] as ContactItem[],
     address: [] as AddressItem[],
     classify: [] as string[],
-    record: [] as RecordRes[],
+    record: [] as RecordRes[], // 明确指定 RecordRes 类型（flag_inJQ 为 string）
     created_time: ``,
     updated_time: ``,
     deleted_time: null,
@@ -591,6 +675,11 @@ const formData = reactive({
       deleted_time: null,
     };
     formRef.value?.clearValidate();
+    // 重置记录表单
+    showAddRecordForm.value = false;
+    newRecordForm.content = "";
+    newRecordForm.flag_inJQ = "否"; // 重置为 string 类型的 "否"
+    recordFormRef.value?.clearValidate();
   },
   funcRemoveAddress: (index: number) => {
     formData.data.address.splice(index, 1);
@@ -605,9 +694,7 @@ const formData = reactive({
     try {
       const response = await $fetch<Res<Classify[]>>(`/api/classify/get`, {
         method: `GET`,
-        params: {
-          id: props.classifyIds.join(`,`),
-        },
+        params: { id: props.classifyIds.join(`,`) },
       });
       if (response.code === 200) {
         formData.data.classify.splice(
@@ -642,9 +729,9 @@ const formData = reactive({
             credential: targetPerson.credential || [],
             contact: targetPerson.contact || [],
             address: targetPerson.address || [],
-            classify: targetPerson.classify ?? [], // 使用空数组默认值
-            record: targetPerson.record || [],
-            created_time: targetPerson.created_time || ``, // 处理null情况
+            classify: targetPerson.classify ?? [],
+            record: targetPerson.record || [], // RecordRes 中 flag_inJQ 为 string 类型
+            created_time: targetPerson.created_time || ``,
             updated_time: targetPerson.updated_time || ``,
             deleted_time: null,
           };
@@ -675,10 +762,12 @@ const formData = reactive({
     }
   },
 });
+
 const paginationData = reactive({
   current: 1,
   pageSize: 10,
 });
+
 // ---------------------- 4. 计算属性 ----------------------
 const pagedRecordList = computed(() => {
   const records = formData.data.record || [];
@@ -694,6 +783,7 @@ const drawerTitle = computed(() => {
   };
   return titleMap[props.mode];
 });
+
 // ---------------------- 5. 方法 ----------------------
 const handlePageChange = (page: number) => {
   paginationData.current = page;
@@ -702,12 +792,73 @@ const handlePageSizeChange = (size: number) => {
   paginationData.pageSize = size;
   paginationData.current = 1;
 };
+
+// 处理添加记录逻辑（适配 string 类型 flag_inJQ）
+const handleAddRecord = async () => {
+  if (!recordFormRef.value) return;
+  try {
+    // 表单验证
+    await recordFormRef.value.validate();
+    drawerData.status.addRecordLoading = true;
+
+    // 构造提交数据（flag_inJQ 为 string 类型的 "是"/"否"）
+    const submitData: RecordPO = {
+      content: newRecordForm.content!.trim(),
+      flag_inJQ: newRecordForm.flag_inJQ!, // 直接传递 string 类型值
+      // 如需关联人员ID，补充 person_id
+      // person_id: formData.data.id,
+    };
+
+    // 调用新增记录接口（替换为项目真实接口）
+    // const response = await $fetch<Res<RecordRes[]>>(`/api/record/post`, {
+    //   method: `POST`,
+    //   body: submitData,
+    // });
+
+    // 模拟接口成功（实际开发删除此段，使用真实接口）
+    const mockNewRecord: RecordRes = {
+      id: Math.floor(Math.random() * 10000), // 模拟ID
+      content: newRecordForm.content!,
+      flag_inJQ: newRecordForm.flag_inJQ!, // string 类型的 "是"/"否"
+      created_time: new Date().toDateString(), // 模拟时间戳
+      updated_time: new Date().toDateString(), // 模拟时间戳
+      deleted_time: null,
+      tag: [], // 暂无标签
+    };
+
+    // 成功处理（真实接口逻辑）
+    // if (response.code === 200 && response.data) {
+    //   const newRecord = response.data.list?.[0];
+    //   if (newRecord) {
+    //     formData.data.record.unshift(newRecord); // 添加到列表头部
+    //   }
+    // }
+
+    // 模拟成功：添加到本地列表
+    formData.data.record.unshift(mockNewRecord);
+    ElMessage.success("新增记录成功");
+    // 重置表单
+    showAddRecordForm.value = false;
+    newRecordForm.content = "";
+    newRecordForm.flag_inJQ = "否"; // 重置为 string 类型的 "否"
+    recordFormRef.value.clearValidate();
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : `未知错误`;
+    ElMessage.error(`新增记录失败：${errorMsg}`);
+  } finally {
+    drawerData.status.addRecordLoading = false;
+  }
+};
+
 const switchToEditMode = () => {
   emit(`update:mode`, `edit`);
 };
 const switchToViewMode = () => {
   emit(`update:mode`, `view`);
   formRef.value?.clearValidate();
+  // 切换回查看模式时隐藏记录表单
+  showAddRecordForm.value = false;
+  recordFormRef.value?.clearValidate();
 };
 const handleClose = () => {
   emit(`update:visible`, false);
@@ -812,7 +963,7 @@ const handleSaveSubmit = async () => {
           contact: updatedPerson.contact || formData.data.contact,
           address: updatedPerson.address || formData.data.address,
           classify: updatedPerson.classify ?? formData.data.classify,
-          record: updatedPerson.record || formData.data.record,
+          record: updatedPerson.record || formData.data.record, // 保留 string 类型的 flag_inJQ
           created_time:
             updatedPerson.created_time || formData.data.created_time,
           updated_time:
@@ -835,6 +986,7 @@ const handleSaveSubmit = async () => {
     drawerData.status.submitLoading = false;
   }
 };
+
 // ---------------------- 6. 监听器 ----------------------
 watch(
   () => [props.mode, props.personId, props.classifyIds, props.visible],
@@ -857,6 +1009,7 @@ watch(
   },
   { immediate: true },
 );
+
 // 客户端初始化
 onMounted(() => {
   if (
@@ -868,7 +1021,14 @@ onMounted(() => {
     formData.funcLoad();
   }
 });
+
+// 补充 formatDate 方法（适配日期格式化）
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return "";
+  return formatDateTime(dateStr); // 复用已有的 formatDateTime
+};
 </script>
+
 <style scoped lang="scss">
 // 全局 SCSS 变量 fallback
 $spacing-sm: 8px !default;
@@ -877,12 +1037,14 @@ $spacing-xl: 24px !default;
 $font-size-xl: 18px !default;
 $text-primary: #333 !default;
 $text-info: #999 !default;
+
 .person-detail-container {
   padding: $spacing-xl;
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
 }
+
 .drawer-header {
   display: flex;
   justify-content: space-between;
@@ -890,21 +1052,26 @@ $text-info: #999 !default;
   margin-bottom: $spacing-md;
   padding-bottom: $spacing-md;
   border-bottom: 1px solid #e5e5e5;
+
   .drawer-title {
     margin: 0;
     font-size: $font-size-xl;
     color: $text-primary;
   }
 }
+
 .switch-edit-btn {
   margin-left: auto;
 }
+
 .inline-form-item {
   margin-bottom: 0;
+
   :deep(.el-form-item__content) {
     margin-left: 0 !important;
   }
 }
+
 .editable-credentials,
 .editable-contacts,
 .editable-addresses {
@@ -912,6 +1079,7 @@ $text-info: #999 !default;
   flex-direction: column;
   gap: $spacing-sm;
 }
+
 .credential-input-group,
 .contact-input-group,
 .address-input-group {
@@ -919,14 +1087,35 @@ $text-info: #999 !default;
   align-items: center;
   gap: $spacing-sm;
 }
+
 .add-credential-btn,
 .add-contact-btn,
 .add-address-btn {
   align-self: flex-start;
 }
+
+// 记录相关样式
+.add-record-btn {
+  margin-left: auto;
+}
+
+.add-record-form {
+  margin-bottom: $spacing-md;
+  padding: $spacing-sm;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+
+  .form-tip {
+    margin-left: $spacing-sm;
+    color: $text-info;
+    font-size: 12px;
+  }
+}
+
 .info-array-container {
   min-height: 40px;
 }
+
 .empty-data-wrapper {
   display: flex;
   align-items: center;
@@ -934,6 +1123,7 @@ $text-info: #999 !default;
   height: 40px;
   color: $text-info;
 }
+
 .drawer-footer {
   display: flex;
   justify-content: flex-end;
@@ -941,70 +1131,93 @@ $text-info: #999 !default;
   padding: $spacing-md;
   border-top: 1px solid #e5e5e5;
 }
+
 .text-male {
   color: #409eff;
 }
+
 .text-female {
   color: #f56c6c;
 }
+
 :deep(.el-descriptions__label) {
   font-weight: bold;
 }
+
 :deep(.el-descriptions__content) {
   padding: $spacing-sm;
 }
+
 .classify-tags {
   display: flex;
   flex-wrap: wrap;
   gap: $spacing-sm;
 }
+
 .records-card {
   margin-top: $spacing-md;
 }
+
 .pagination-container {
   display: flex;
   justify-content: flex-end;
   margin-top: $spacing-md;
   padding-right: $spacing-sm;
 }
+
 .empty-state {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 200px;
 }
+
 .no-data {
   color: $text-info;
   font-style: italic;
 }
+
 // 响应式设计
 @media (max-width: 768px) {
   .person-detail-container {
     padding: $spacing-md;
   }
+
   .drawer-footer {
     flex-direction: column;
     gap: $spacing-sm;
+
     .el-button {
       width: 100%;
       margin-left: 0;
     }
   }
+
   :deep(.el-descriptions) {
     &.info-descriptions {
       .el-descriptions__header {
         display: none;
       }
+
       .el-descriptions-item {
         display: block;
         width: 100%;
+
         .el-descriptions-item__label {
           width: 100px;
         }
+
         .el-descriptions-item__content {
           flex: 1;
         }
       }
+    }
+  }
+
+  // 响应式：适配新增记录表单
+  .add-record-form {
+    :deep(.el-input) {
+      width: 100% !important;
     }
   }
 }

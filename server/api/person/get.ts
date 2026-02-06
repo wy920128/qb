@@ -3,7 +3,7 @@ import { utilsQuery } from "~/server/utils/query";
 
 export default defineEventHandler(async (event): Promise<Res<PersonRes[]>> => {
   try {
-    const query = getQuery(event);
+    const queryParams = getQuery(event);
     const {
       page = 1,
       pageSize = 10,
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event): Promise<Res<PersonRes[]>> => {
       id_number,
       classifyIds,
       ...rest
-    } = query;
+    } = queryParams;
 
     // 类型转换
     const currentPage = Number(page) || 1;
@@ -78,10 +78,26 @@ export default defineEventHandler(async (event): Promise<Res<PersonRes[]>> => {
     // 动态添加过滤条件（同时应用到selectSql和countSql）
 
     // 1. id 精确匹配
+
     if (id !== undefined && id !== ``) {
-      selectSql += ` AND p.id = ?`;
-      countSql += ` AND p.id = ?`;
-      params.push(Number(id));
+      if (Array.isArray(id)) {
+        const validIdArray = id.filter((item) => {
+          const num = Number(item);
+          return !isNaN(num) && num !== undefined;
+        });
+        if (validIdArray.length > 0) {
+          selectSql += ` AND p.id IN (?)`;
+          countSql += ` AND p.id IN (?)`;
+          params.push(validIdArray);
+        }
+      } else {
+        const numId = Number(id);
+        if (!isNaN(numId)) {
+          selectSql += ` AND p.id = ?`;
+          countSql += ` AND p.id = ?`;
+          params.push(numId);
+        }
+      }
     }
 
     // 2. name 模糊匹配
