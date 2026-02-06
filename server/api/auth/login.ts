@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-06 08:38:45
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-30 10:26:07
+ * @LastEditTime: 2026-02-06 13:20:38
  * @FilePath: /vip/server/api/auth/login.ts
  * @Description: 后台登录接口
  */
@@ -61,7 +61,7 @@ export default defineEventHandler(
         });
       }
       const user = {
-        id: userResult[0].id ? Number(userResult[0].id) : 0,
+        id: userResult[0].id || `0`,
         username: userResult[0].username,
         role: userResult[0].role,
         created_time: userResult[0].created_time,
@@ -69,14 +69,14 @@ export default defineEventHandler(
         deleted_time: userResult[0].deleted_time,
       };
       const token = await new SignJWT({
-        sub: `${user.id}`,
+        sub: user.id,
         username: user.username,
         role: user.role,
       })
         .setProtectedHeader({ alg: `HS256` })
         .setExpirationTime(expiresIn)
         .sign(JWT_SECRET);
-        const decoded = await jwtVerify(token, JWT_SECRET)
+      const decoded = await jwtVerify(token, JWT_SECRET);
       return {
         code: 200, // 成功状态码
         data: {
@@ -120,4 +120,3 @@ export default defineEventHandler(
     }
   },
 );
-

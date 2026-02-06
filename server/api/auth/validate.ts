@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-06 08:38:45
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-22 10:14:47
+ * @LastEditTime: 2026-02-06 13:18:58
  * @FilePath: /vip/server/api/auth/validate.ts
  * @Description: Token验证接口
  */
@@ -44,8 +44,8 @@ export default defineEventHandler(
       }
       // 3. 从token中提取用户信息
       const payload = decoded.payload;
-      const userId = parseInt(payload.sub || `0`);
-      const username = payload.username as string;
+      const userId: string = payload.sub || ``;
+      const username: string = payload.username as string;
       if (!userId || !username) {
         throw createError({
           statusCode: 401,
@@ -58,6 +58,7 @@ export default defineEventHandler(
         FROM auth 
         WHERE id = ? AND username = ? AND deleted_time IS NULL
       `;
+      console.log(`->`, userSelectSql, userId, username);
       const userResult: (Auth & Time)[] = await utilsQuery(userSelectSql, [
         userId,
         username,

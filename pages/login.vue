@@ -178,13 +178,34 @@ const loginFormData: {
     min-width: 400px;
     box-shadow: $shadow-md;
     padding: $spacing-xl;
-    .login-title {
-      margin-bottom: $spacing-lg;
-      font-size: $font-size-lg;
-      color: $text-primary;
+    display: flex;
+    flex-direction: column;
+    .login-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      .login-title {
+        margin-bottom: $spacing-lg;
+        font-size: $font-size-lg;
+        color: $text-primary;
+      }
     }
     .login-form {
       margin-top: $spacing-md;
+      .button-group {
+        margin-top: $spacing-md;
+        .button-row {
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          .login-btn,
+          .reset-btn {
+            width: 100%;
+          }
+        }
+      }
     }
   }
 }

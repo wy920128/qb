@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2025-12-24 08:06:59
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-22 15:56:29
+ * @LastEditTime: 2026-02-06 13:26:11
  * @FilePath: /vip/README.md
  * @Description: 项目文档
 -->
@@ -182,7 +182,7 @@
 
    -- 2. 创建用户表(auth)
    CREATE TABLE IF NOT EXISTS auth (
-   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '用户主键 ID',
+   id CHAR(36) NOT NULL DEFAULT (UUID()) PRIMARY KEY COMMENT '用户主键 ID',
    username VARCHAR(50) UNIQUE NOT NULL COMMENT '登录用户名',
    password VARCHAR(255) NOT NULL COMMENT '加密密码(推荐 bcrypt)',
    role JSON DEFAULT NULL COMMENT '用户角色',
@@ -217,6 +217,7 @@
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '人员主键 ID',
    name VARCHAR(100) NOT NULL COMMENT '人员姓名',
    gender ENUM('男', '女') NOT NULL COMMENT '性别',
+   birthday DATE COMMENT '出生日期',
    credential JSON COMMENT '证件信息(JSON 格式)',
    contact JSON COMMENT '联系方式(JSON 格式)',
    address JSON COMMENT '联系地址(JSON 格式)',
@@ -229,6 +230,7 @@
    -- 6. 创建记录表(record)
    CREATE TABLE IF NOT EXISTS record (
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '记录主键 ID',
+   flag_inJQ ENUM('是', '否') NOT NULL DEFAULT '否' COMMENT '是否在警情中',
    content TEXT NOT NULL COMMENT '事件内容',
    created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
    updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -238,7 +240,7 @@
 
    -- 7. 创建用户关联部门表(auth2department)
    CREATE TABLE IF NOT EXISTS auth2department (
-   auth_id INT UNSIGNED NOT NULL COMMENT '用户 ID',
+   auth_id CHAR(36) NOT NULL COMMENT '用户 ID',
    department_id INT UNSIGNED NOT NULL COMMENT '部门 ID',
    created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
    updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -250,7 +252,7 @@
 
    -- 8. 创建用户关联分类表(auth2classify)
    CREATE TABLE IF NOT EXISTS auth2classify (
-   auth_id INT UNSIGNED NOT NULL COMMENT '用户 ID',
+   auth_id CHAR(36) NOT NULL COMMENT '用户 ID',
    classify_id INT UNSIGNED NOT NULL COMMENT '分类 ID',
    created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
    updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -262,7 +264,7 @@
 
    -- 9. 创建用户关联人员表(auth2person)
    CREATE TABLE IF NOT EXISTS auth2person (
-   auth_id INT UNSIGNED NOT NULL COMMENT '用户 ID',
+   auth_id CHAR(36) NOT NULL COMMENT '用户 ID',
    person_id INT UNSIGNED NOT NULL COMMENT '人员 ID',
    created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
    updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -333,12 +335,12 @@
    ('言语冲突');
 
    -- 插入人员数据
-   INSERT INTO person (name, gender, credential, contact, address) VALUES
-   ('张三', '男',
+   INSERT INTO person (name, gender, birthday, credential, contact, address) VALUES
+   ('张三', '男', '1990-01-01',
    '[{"type": "二代身份证", "value": "342622199001011111"}]',
    '[{"type": "手机号", "value": "13800138000"}]',
    '[{"type": "家庭地址", "value": "北京市海淀区"}]'),
-   ('李四', '女',
+   ('李四', '女', '1992-02-02',
    '[{"type": "护照", "value": "E12345678"}]',
    '[{"type": "邮箱", "value": "lisi@example.com"}]',
    '[{"type": "工作地址", "value": "上海市浦东新区"}]');
@@ -350,17 +352,17 @@
 
    -- 插入关联数据
    INSERT INTO auth2department (auth_id, department_id) VALUES
-   (1, 1), -- 025871 关联超级管理员
-   (2, 2), -- 000001 关联佳木斯铁路公安处
-   (3, 3); -- 000002 关联佳木斯站派出所
+   ((SELECT id FROM auth WHERE username = '025871'), 1), -- 025871 关联超级管理员
+   ((SELECT id FROM auth WHERE username = '000001'), 2), -- 000001 关联佳木斯铁路公安处
+   ((SELECT id FROM auth WHERE username = '000002'), 3); -- 000002 关联佳木斯站派出所
 
    INSERT INTO auth2classify (auth_id, classify_id) VALUES
-   (1, 1), -- 025871 管理涉酒分类
-   (2, 2); -- 000001 管理涉毒分类
+   ((SELECT id FROM auth WHERE username = '000001'), 1), -- 000001 管理涉酒分类
+   ((SELECT id FROM auth WHERE username = '000002'), 2); -- 000002 管理涉毒分类
 
    INSERT INTO auth2person (auth_id, person_id) VALUES
-   (1, 1), -- 025871 管理张三
-   (2, 2); -- 000001 管理李四
+   ((SELECT id FROM auth WHERE username = '000001'), 1), -- 000001 管理张三
+   ((SELECT id FROM auth WHERE username = '000002'), 2); -- 000002 管理李四
 
    INSERT INTO classify2person (person_id, classify_id) VALUES
    (1, 1), -- 张三属于涉酒分类

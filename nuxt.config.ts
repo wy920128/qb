@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-15 14:10:54
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-01-31 08:14:34
+ * @LastEditTime: 2026-02-06 12:48:55
  * @FilePath: /qb/nuxt.config.ts
  * @Description: nuxt 配置文件
  */
@@ -22,28 +22,23 @@ export default defineNuxtConfig({
     importStyle: `scss`,
     defaultLocale: `zh-cn`,
   },
-  // routeRules: {
-  //   "\/": {
-  //     redirect: `/person/list`,
-  //   },
-  // },
   runtimeConfig: {
     server: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || `/api`,
     },
-    db_aliyun: {
-      dbHost: process.env.DB_ALY_HOST,
-      dbPort: process.env.DB_ALY_PORT,
-      dbUser: process.env.DB_ALY_USER,
-      dbPassword: process.env.DB_ALY_PASSWORD,
-      dbName: process.env.DB_ALY_NAME,
+    db: {
+      dbHost: process.env.DB_HOST,
+      dbPort: process.env.DB_PORT,
+      dbUser: process.env.DB_USER,
+      dbPassword: process.env.DB_PASSWORD,
+      dbName: process.env.DB_NAME,
     },
-    db_gaw: {
-      dbHost: process.env.DB_GAW_HOST,
-      dbPort: process.env.DB_GAW_PORT,
-      dbUser: process.env.DB_GAW_USER,
-      dbPassword: process.env.DB_GAW_PASSWORD,
-      dbName: process.env.DB_GAW_NAME,
+    db_lk: {
+      dbHost: process.env.DB_LK_HOST,
+      dbPort: process.env.DB_LK_PORT,
+      dbUser: process.env.DB_LK_USER,
+      dbPassword: process.env.DB_LK_PASSWORD,
+      dbName: process.env.DB_LK_NAME,
     },
   },
   vite: {

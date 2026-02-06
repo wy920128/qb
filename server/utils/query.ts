@@ -2,7 +2,7 @@
  * @Author: 王野 18545455617@163.com
  * @Date: 2026-01-16 10:51:23
  * @LastEditors: 王野 18545455617@163.com
- * @LastEditTime: 2026-02-05 14:13:22
+ * @LastEditTime: 2026-02-06 12:50:24
  * @FilePath: /qb/server/utils/query.ts
  * @Description: 修复数据库查询工具函数 - 解决迭代器错误
  */
@@ -14,11 +14,11 @@ const runtimeConfig = useRuntimeConfig();
 
 // 配置连接池
 const poolConfig: PoolConfig = {
-  host: runtimeConfig.db_aliyun.dbHost,
-  user: runtimeConfig.db_aliyun.dbUser,
-  password: runtimeConfig.db_aliyun.dbPassword,
-  database: runtimeConfig.db_aliyun.dbName,
-  port: parseInt(runtimeConfig.db_aliyun.dbPort!),
+  host: runtimeConfig.db.dbHost,
+  user: runtimeConfig.db.dbUser,
+  password: runtimeConfig.db.dbPassword,
+  database: runtimeConfig.db.dbName,
+  port: parseInt(runtimeConfig.db.dbPort!),
   connectionLimit: 10,
   connectTimeout: 5000,
   multipleStatements: false,

@@ -10,10 +10,10 @@
     <!-- 展示 认证状态数据（复用 useAuth 中的数据） -->
     <div class="cookie-data" v-if="isLoginValid">
       <h3>认证状态数据:</h3>
-      <div class="data-item">
+      <!-- <div class="data-item">
         <span class="label">Token: </span>
         <span class="value">{{ auth.getToken.value || "无" }}</span>
-      </div>
+      </div> -->
       <div class="data-item">
         <span class="label">用户ID: </span>
         <span class="value">{{ auth.getUser.value?.id || "无" }}</span>
@@ -43,10 +43,10 @@
         <span class="value">{{ isLoginValid ? "已认证" : "未认证" }}</span>
       </div>
       <!-- 展示原始 Cookie 数据（方便调试，复用 useAuth 的 Cookie 逻辑） -->
-      <div class="data-item raw-data">
+      <!-- <div class="data-item raw-data">
         <span class="label">原始 Cookie 数据: </span>
         <pre class="value">{{ JSON.stringify(cookieData, null, 2) }}</pre>
-      </div>
+      </div> -->
       <!-- 操作按钮 -->
       <div class="action-buttons">
         <button @click="handleLogout" class="logout-btn">退出登录</button>
